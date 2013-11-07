@@ -14,70 +14,106 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
 
 public class Contact {
-	private int contactId;
-	private String androidContactId;
+	private long contactId;
 	private String displayName;
-	private ArrayList<Phone> phones;
-	private ArrayList<Email> emails;
+	private ArrayList<Phone> phones = new ArrayList<Phone>();
+	private ArrayList<Email> emails = new ArrayList<Email>();
+	private ArrayList<NotificationRule> notificationRules = new ArrayList<NotificationRule>();
 	private Bitmap photo;
-	
-	public static List<Contact> getPhoneContacts(Context context) {
-		ArrayList<Contact> contacts = new ArrayList<Contact>();
-		
-		Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,null, null, null, null); 
-		while (cursor.moveToNext()) { 
-		   contacts.add(new Contact(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID)), context));
-		}
-		cursor.close(); 
-		
-		return contacts;
+
+	public interface ContactNotFoundHandler {
+		public void onContactNotFound(long contactId);
 	}
 	
-	public Contact(String androidContactId, Context context) {
+	public Contact(long contactId, Context context) throws ContactNotFoundException {
+		
+		this.contactId = contactId;
 		
 		boolean hasPhoneNumber = false;
 		Uri photoUri = null;
 		
 		//get general info
-		Cursor contact = context.getContentResolver().query( ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts._ID +" = "+ androidContactId, null, null);
-		while(contact.moveToFirst()) {
+		Cursor contact = context.getContentResolver().query( ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts._ID +" = "+ contactId, null, null);
+		if(contact.moveToFirst()) {
 			displayName = contact.getString(contact.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 			hasPhoneNumber = Boolean.parseBoolean(contact.getString(contact.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
-			photoUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, Long.parseLong(androidContactId));
-		}
+			photoUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
 		
-		//get phones
-		this.phones = new ArrayList<Phone>();
-		if(hasPhoneNumber) {
-			Cursor phones = context.getContentResolver().query( ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ androidContactId, null, null); 
-			while (phones.moveToNext()) {
-				  this.phones.add(new Phone(phones));
+			//get phones
+			if(hasPhoneNumber) {
+				Cursor phones = context.getContentResolver().query( ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ contactId, null, null); 
+				while (phones.moveToNext()) {
+					  this.phones.add(new Phone(phones));
+				} 
+				phones.close();
+			}
+			
+			//get emails
+			Cursor emails = context.getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId, null, null); 
+			while (emails.moveToNext()) { 
+				this.emails.add(new Email(emails));
 			} 
-			phones.close();
+			emails.close();
+			
+			//get photo
+			if (photoUri != null) {
+		        InputStream photoStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(), photoUri);
+		        if (photoStream != null) {
+		            photo = BitmapFactory.decodeStream(photoStream);
+		        }
+		    }
+		} else {
+			throw new ContactNotFoundException(contactId);
+		}
+	}
+	
+	public class ContactNotFoundException extends Exception {
+
+		private static final long serialVersionUID = 1L;
+		private final long contactId;
+		
+		public ContactNotFoundException(long contactId) {
+			this.contactId = contactId;
 		}
 		
-		//get emails
-		Cursor emails = context.getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId, null, null); 
-		this.emails = new ArrayList<Email>();
-		while (emails.moveToNext()) { 
-			this.emails.add(new Email(emails));
-		} 
-		emails.close();
-		
-		//get photo
-		if (photoUri != null) {
-	        InputStream photoStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(), photoUri);
-	        if (photoStream != null) {
-	            photo = BitmapFactory.decodeStream(photoStream);
-	        }
-	    }
+		public long getcontactId() {
+			return contactId;
+		}
 	}
 
-	public int getContactId() {
+	public long getContactId() {
 		return contactId;
 	}
-	public String getAndroidContactId() {
-		return androidContactId;
+	
+	/*
+	 * returns a list of notification rules assigned specifically to this contact
+	 */
+	public List<NotificationRule> getNotificationRules() {
+		ArrayList<NotificationRule> list = new ArrayList<NotificationRule>();
+		list.addAll(notificationRules);
+		return list;
+	}
+	
+	public boolean hasNotificationRules() {
+		return notificationRules.size() > 0;
+	}
+	
+	/*
+	 * adds a notification rule for this specific contact
+	 */
+	public boolean addNotificationRule(NotificationRule notificationRule) {
+		if(!notificationRules.contains(notificationRule)) {
+			return notificationRules.add(notificationRule);
+		} else {
+			return false;
+		}
+	}
+
+	/*
+	 * removes a notification rule assigned specifically to this contact
+	 */
+	public boolean removeNotificationRule(NotificationRule notificationRule) {
+		return notificationRules.remove(notificationRule);
 	}
 	
 	public String getDisplayName() {
@@ -210,5 +246,3 @@ public class Contact {
 		}
 	}
 }
-
-
