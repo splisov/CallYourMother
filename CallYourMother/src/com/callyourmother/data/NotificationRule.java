@@ -6,8 +6,16 @@ import java.util.Stack;
 
 public class NotificationRule {
 	
-	public static final int TYPE_INTERVAL_DAYS = 1;
-	public static final int TYPE_DATE_ONCE = 2;
+	public static final int INTERVAL_DATE = 1;
+	public static final int INTERVAL_HOURS = 2;
+	public static final int INTERVAL_DAYS = 3;
+	public static final int INTERVAL_WEEKS = 4;
+	public static final int INTERVAL_MONTHS = 5;
+	public static final int INTERVAL_YEARS = 6;
+	
+	public static final int TYPE_ONETIME = 1;
+	public static final int TYPE_REPEATING = 2;
+	
 	
 	private long notificationRuleId = -1;
 	private int type = -1;
@@ -66,14 +74,13 @@ public class NotificationRule {
 	}
 	
 	public Date getNextNotification() {
-		switch(type) {
-		case NotificationRule.TYPE_DATE_ONCE:
+		if(interval == NotificationRule.INTERVAL_DATE) {
 			if(hasOccurred()) {
 				return null;
 			} else {
 				return notificationDate;
 			}
-		case NotificationRule.TYPE_INTERVAL_DAYS:
+		} else {
 			NotificationOccurrence lastOccurrence = getLastOccurrence();
 			Date lastOccurrenceDate;
 			if(lastOccurrence != null) {
@@ -83,10 +90,26 @@ public class NotificationRule {
 			}
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(lastOccurrenceDate);
-			calendar.add(Calendar.DATE, interval);
+			switch(interval) {
+				case NotificationRule.INTERVAL_HOURS:
+					calendar.add(Calendar.HOUR, interval);
+					break;
+				case NotificationRule.INTERVAL_DAYS:
+					calendar.add(Calendar.DATE, interval);
+					break;
+				case NotificationRule.INTERVAL_WEEKS:
+					calendar.add(Calendar.DATE, interval*7);
+					break;
+				case NotificationRule.INTERVAL_MONTHS:
+					calendar.add(Calendar.MONTH, interval);
+					break;
+				case NotificationRule.INTERVAL_YEARS:
+					calendar.add(Calendar.YEAR, interval);
+					break;
+				default:
+					return null;
+			}
 			return calendar.getTime();
-		default:
-			return null;
 		}
 	}
 	
