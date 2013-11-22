@@ -4,6 +4,8 @@ import java.util.List;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +24,7 @@ public class MainActivity extends Activity {
 	private CircleAdapter mAdapter;
 	private ListView listView1;
 	public static final String NOTIFIED = "None";
+	private AlarmManager mAlarmManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,9 @@ public class MainActivity extends Activity {
 						NotificationActivity.class), NOTIFICATION_DRAWER);
 			}
 		});*/
+		
+		
+		
 		
 		circleFooterView.setOnClickListener(new OnClickListener() {
 			@Override
@@ -97,4 +103,13 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	public void checkCallLog(){
+		long delay = 1000L;
+		Intent startCheckContactDataIntent = new Intent(this, UpdateTransactionsService.class);
+		PendingIntent pIntent = PendingIntent.getService(this,  1, startCheckContactDataIntent, PendingIntent.FLAG_ONE_SHOT);
+		mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, AlarmManager.INTERVAL_DAY, delay, pIntent);
+		
+		//Using loader to get call info
+		//getLoaderManager().initLoader(0, null, this);
+	}
 }
