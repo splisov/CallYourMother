@@ -4,19 +4,61 @@ import java.util.List;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ListActivity;
+import android.content.Intent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
-
 import com.callyourmother.data.*;
 
 public class MainActivity extends Activity {
-
+	private static final int NOTIFICATION_DRAWER = 0;
+	private static final int CREATE_NEW_CIRCLE = 1;
+	private CircleAdapter mAdapter;
+	  private ListView listView1;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		Circle circle_data[] = new Circle[]{new Circle("Test"),new Circle("Showers")};
+			        
+		mAdapter = new CircleAdapter(this, R.layout.circle_item, circle_data);
+			         
+		listView1 = (ListView)findViewById(R.id.listView1);		      
+		View header = (View)getLayoutInflater().inflate(R.layout.header, null);
+		listView1.addHeaderView(header);
+		View notifFooterView = (View)getLayoutInflater().inflate(R.layout.notification_footer_view, null);
+		View circleFooterView = (View)getLayoutInflater().inflate(R.layout.add_circle_footer_view, null);
+		listView1.addFooterView(notifFooterView);
+		listView1.addFooterView(circleFooterView);
+		listView1.setAdapter(mAdapter);
+		
+	/*	notifFooterView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivityForResult(new Intent(MainActivity.this,
+						NotificationActivity.class), NOTIFICATION_DRAWER);
+			}
+		});
+		
+		circleFooterView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivityForResult(new Intent(MainActivity.this,
+						AddCircleActivity.class), NOTIFICATION_DRAWER);
+			}
+		});*/
+		
+	
 	}
 
 	@Override

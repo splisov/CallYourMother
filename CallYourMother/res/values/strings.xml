@@ -3,5 +3,6 @@
 
     <string name="app_name">CallYourMother</string>
     <string name="hello_world">Hello world!</string>
+    <string name="add_circle">Add a New Circle</string>
 
 </resources>
