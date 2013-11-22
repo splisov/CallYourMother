@@ -7,13 +7,10 @@
     
     
     <Button
-        android:id="@+id/buttonView"
+        android:id="@+id/notification_test"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:textSize="19dp"
-        android:text="Add a New Circle"
-        android:gravity="center_horizontal"
-        />
+        android:text="Make notification" />
 
 
 </LinearLayout>
