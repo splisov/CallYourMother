@@ -4,23 +4,13 @@ import java.util.List;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.app.ListActivity;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
-import android.content.Intent;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.view.Window;
-import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.callyourmother.data.*;
@@ -57,16 +47,26 @@ public class MainActivity extends Activity {
 				startActivityForResult(new Intent(MainActivity.this,
 						NotificationActivity.class), NOTIFICATION_DRAWER);
 			}
-		});
+		});*/
 		
 		circleFooterView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivityForResult(new Intent(MainActivity.this,
-						AddCircleActivity.class), NOTIFICATION_DRAWER);
+				startActivity(new Intent(MainActivity.this,
+						AddCircleActivity.class));
 			}
-		});*/
+		});
 		
+		Button notiTest = (Button) findViewById(R.id.notification_test);
+
+		notiTest.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent notiIntent = new Intent(MainActivity.this, NotifyUser.class);
+				startService(notiIntent);
+				
+			}
+		});
 	
 	}
 
@@ -93,17 +93,6 @@ public class MainActivity extends Activity {
 								return false;
 							}
 						});
-
-		Button notiTest = (Button) findViewById(R.id.notification_test);
-
-		notiTest.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent notiIntent = new Intent(MainActivity.this, NotifyUser.class);
-				startService(notiIntent);
-				
-			}
-		});
 
 		return true;
 	}
