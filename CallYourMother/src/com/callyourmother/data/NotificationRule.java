@@ -2,7 +2,7 @@ package com.callyourmother.data;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Stack;
+import java.util.List;
 
 public class NotificationRule {
 	
@@ -21,22 +21,39 @@ public class NotificationRule {
 	private int type = -1;
 	private Date notificationDate = null;
 	private int interval = -1;
-	private Stack<NotificationOccurrence> occurrenceHistory = new Stack<NotificationOccurrence>();
 	private Date startDate = null;
+	private String description;
 	
 	public NotificationRule() { }
-	public NotificationRule(long notificationRuleId, int type, int interval, Date notificationDate, Date startDate) {
+	public NotificationRule(long notificationRuleId, String description, int type, int interval, Date notificationDate, Date startDate) {
 		this.notificationRuleId = notificationRuleId;
 		this.type = type;
 		this.interval = interval;
 		this.notificationDate = notificationDate;
 		this.startDate = startDate;
 	}
+
+	
+	public void setNotificationRuleId(long notificationRuleId) {
+		this.notificationRuleId = notificationRuleId;
+	}
 	
 	public long getNotificationRuleId() {
 		return notificationRuleId;
 	}
 	
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	public void setType(int type) {
+		this.type = type;
+	}
+
 	public int getType() {
 		return type;
 	}
@@ -52,36 +69,29 @@ public class NotificationRule {
 	public void setNotificationDate(Date notificationDate) {
 		this.notificationDate = notificationDate;
 	}
+
+	public Date getNotificationDate() {
+		return notificationDate;
+	}
+
 	
-	public Date getCreatedDate() {
+	public Date getStartDate() {
 		return startDate;
 	}
-	
-	public boolean hasOccurred() {
-		return occurrenceHistory.size() > 0;
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
 	}
 	
-	public NotificationOccurrence getLastOccurrence() {
-		if(hasOccurred()) {
-			return occurrenceHistory.firstElement();
-		} else {
-			return null;
-		}
-	}
-	
-	public void logOccurrence(int notificationOccurrenceAction) {
-		occurrenceHistory.push(new NotificationOccurrence(notificationRuleId, new Date(), notificationOccurrenceAction));
-	}
-	
-	public Date getNextNotification() {
+	public Date getNextNotification(List<NotificationOccurrence> notificationOccurrenceHistory) {
 		if(interval == NotificationRule.INTERVAL_DATE) {
-			if(hasOccurred()) {
+			if(notificationOccurrenceHistory == null || notificationOccurrenceHistory.size() == 0) {
 				return null;
 			} else {
 				return notificationDate;
 			}
 		} else {
-			NotificationOccurrence lastOccurrence = getLastOccurrence();
+			NotificationOccurrence lastOccurrence = (notificationOccurrenceHistory!=null&&notificationOccurrenceHistory.size()>0?notificationOccurrenceHistory.get(notificationOccurrenceHistory.size()-1):null);
 			Date lastOccurrenceDate;
 			if(lastOccurrence != null) {
 				lastOccurrenceDate = lastOccurrence.getDate();
@@ -111,47 +121,5 @@ public class NotificationRule {
 			}
 			return calendar.getTime();
 		}
-	}
-	
-	public class NotificationOccurrence {
-		public static final int ACTION_COMPLETED = 1;
-		public static final int ACTION_IGNORED = 1;
-		
-		private long notificationOccurrenceId = -1;
-		private long notificationRuleId;
-		private Date date;
-		private int action;
-		
-		public NotificationOccurrence(long notificationOccurrenceId, long notificationRuleId, Date date, int action) {
-			this.notificationRuleId = notificationRuleId;
-			this.date = date;
-			this.action = action;
-		}
-		public NotificationOccurrence(long notificationRuleId, Date date, int action) {
-			this.notificationRuleId = notificationRuleId;
-			this.date = date;
-			this.action = action;
-		}
-		
-		public void setNotificationOccurrenceId(long notificationOccurrenceId) {
-			this.notificationOccurrenceId = notificationOccurrenceId;
-		}
-
-		public long getNotificationOccurrenceId() {
-			return notificationOccurrenceId;
-		}
-	
-		public long getNotificationRuleId() {
-			return notificationRuleId;
-		}
-		
-		public Date getDate() {
-			return date;
-		}
-		
-		public int getAction() {
-			return action;
-		}
-		
 	}
 }

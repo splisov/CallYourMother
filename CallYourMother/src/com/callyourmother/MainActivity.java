@@ -25,15 +25,19 @@ public class MainActivity extends Activity {
 	private ListView listView1;
 	public static final String NOTIFIED = "None";
 	private AlarmManager mAlarmManager;
+	
+	private DatabaseClient db;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		Circle circle_data[] = new Circle[]{new Circle("Test"),new Circle("Showers")};
-			        
-		mAdapter = new CircleAdapter(this, R.layout.circle_item, circle_data);
+		//creates the database client
+		db = new DatabaseClient(getApplicationContext());
+		
+		//Circle circle_data[] = new Circle[]{new Circle("Test"),new Circle("Showers")};
+		mAdapter = new CircleAdapter(this, R.layout.circle_item, db.getCircles());
 			         
 		listView1 = (ListView)findViewById(R.id.listView1);		      
 		View header = (View)getLayoutInflater().inflate(R.layout.header, null);
@@ -80,26 +84,45 @@ public class MainActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+		super.onCreateOptionsMenu(menu);
 
-		menu.findItem(R.id.action_data_android_contacts_test)
-				.setOnMenuItemClickListener(
-						new MenuItem.OnMenuItemClickListener() {
-							@Override
-							public boolean onMenuItemClick(MenuItem item) {
-								// TODO Auto-generated method stub
-
-								List<Contact> contacts = AndroidUtility
-										.getAndroidContacts(getApplicationContext());
-								for (Contact c : contacts) {
-									Toast.makeText(getApplicationContext(),
-											c.getDisplayName(),
-											Toast.LENGTH_SHORT).show();
-								}
-
-								return false;
-							}
-						});
-
+		menu.findItem(R.id.action_data_android_contacts_test).setOnMenuItemClickListener(
+			new MenuItem.OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					DatabaseTestFunctions.TestCircles(getApplicationContext());
+					return false;
+				}
+			});
+		
+		menu.findItem(R.id.action_data_android_database_delete).setOnMenuItemClickListener(
+			new MenuItem.OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					DatabaseClient db = new DatabaseClient(getApplicationContext());
+					db.deleteDatabase();
+					return false;
+				}
+			});
+		
+		menu.findItem(R.id.action_data_android_circles_create).setOnMenuItemClickListener(
+			new MenuItem.OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					DatabaseTestFunctions.CreateCircles(getApplicationContext());
+					return false;
+				}
+			});
+	
+		menu.findItem(R.id.action_data_android_add_random_contacts).setOnMenuItemClickListener(
+				new MenuItem.OnMenuItemClickListener() {
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						DatabaseTestFunctions.AddRandomContactsToCircles(getApplicationContext());
+						return false;
+					}
+				});
+		
 		return true;
 	}
 

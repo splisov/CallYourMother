@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.callyourmother.data.Circle;
+import com.callyourmother.data.DatabaseClient;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -18,14 +19,17 @@ public class CircleAdapter extends ArrayAdapter<Circle> {
 	private final List<Circle> mItems = new ArrayList<Circle>();
 	private final Context mContext;
 	int layoutResourceId;    
-	Circle data[] = null;
+	List<Circle> data = null;
+	private DatabaseClient db;
 
 	
-    public CircleAdapter(Context context, int layoutResourceId, Circle[] data) {
+    public CircleAdapter(Context context, int layoutResourceId, List<Circle> data) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
         mContext = context;
-        this.data = data;
+        mItems.addAll(data);
+        this.db = new DatabaseClient(context);
+        
     }
 
 	@Override
@@ -59,7 +63,10 @@ public class CircleAdapter extends ArrayAdapter<Circle> {
 	
 
 		TextView nameView = (TextView) itemLayout.findViewById(R.id.circle_name);
-		nameView.setText("Test contact!");
+		nameView.setText(getItem(position).getDescription());
+		
+		
+		((TextView)itemLayout.findViewById(R.id.contact_number)).setText("("+(db.getCircleContactIds(getItem(position).getCircleId()).size()+" contacts)"));
 		
 		return itemLayout;
 	}
