@@ -86,7 +86,7 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		super.onCreateOptionsMenu(menu);
 
-		menu.findItem(R.id.action_data_android_contacts_test).setOnMenuItemClickListener(
+		menu.findItem(R.id.action_data_circles_test).setOnMenuItemClickListener(
 			new MenuItem.OnMenuItemClickListener() {
 				@Override
 				public boolean onMenuItemClick(MenuItem item) {
@@ -122,6 +122,16 @@ public class MainActivity extends Activity {
 						return false;
 					}
 				});
+		
+		menu.findItem(R.id.action_data_notifications_test).setOnMenuItemClickListener(
+				new MenuItem.OnMenuItemClickListener() {
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						DatabaseTestFunctions.TestNotificationData(getApplicationContext());
+						return false;
+					}
+				});
+		
 		
 		return true;
 	}

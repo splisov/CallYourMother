@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Stack;
 
@@ -260,10 +261,26 @@ public class DatabaseClient {
 		try {
 			if(notificationRule.getNotificationRuleId() > 0) {
 				//update
-				sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = ?, startDate = ? WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), (notificationRule!=null?notificationRule.getNotificationDate().getTime():null), (notificationRule.getStartDate()!=null?notificationRule.getStartDate().getTime():null), notificationRule.getNotificationRuleId() });
+				if(notificationRule.getNotificationDate() != null && notificationRule.getStartDate() != null) {
+					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = ?, startDate = ? WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime(), notificationRule.getStartDate().getTime(), notificationRule.getNotificationRuleId() });
+				} else if(notificationRule.getNotificationDate() != null) {
+					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = ?, startDate = NULL WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime(), notificationRule.getNotificationRuleId() });
+				} else if(notificationRule.getStartDate() != null) {
+					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = NULL, startDate = ? WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getStartDate().getTime(), notificationRule.getNotificationRuleId() });
+				} else {
+					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = NULL, startDate = NULL WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationRuleId() });
+				}
 			} else {
 				//insert
-				sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,?,?)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), (notificationRule.getNotificationDate()!=null?notificationRule.getNotificationDate().getTime():null), (notificationRule.getStartDate()!=null?notificationRule.getStartDate().getTime():null) });
+				if(notificationRule.getNotificationDate() != null && notificationRule.getStartDate() != null) {
+					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,?,?)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime(), notificationRule.getStartDate().getTime() });
+				} else if(notificationRule.getNotificationDate() != null) {
+					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,?,NULL)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime() });
+				} else if(notificationRule.getStartDate() != null) {
+					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,NULL,?)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getStartDate().getTime() });
+				} else {
+					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,NULL,NULL)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval() });
+				}
 				Cursor c = sqldb.rawQuery("SELECT MAX(notificationRuleId) FROM NotificationRules", null);
 				if(c.moveToFirst()) {
 					notificationRule.setNotificationRuleId(c.getLong(0));
@@ -288,10 +305,27 @@ public class DatabaseClient {
 		try {
 			if(notificationRule.getNotificationRuleId() > 0) {
 				//update
-				sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = ?, startDate = ? WHERE circleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), (notificationRule!=null?notificationRule.getNotificationDate().getTime():null), (notificationRule.getStartDate()!=null?notificationRule.getStartDate().getTime():null), circleId });
+				if(notificationRule.getNotificationDate() != null && notificationRule.getStartDate() != null) {
+					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = ?, startDate = ? WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime(), notificationRule.getStartDate().getTime(), notificationRule.getNotificationRuleId() });
+				} else if(notificationRule.getNotificationDate() != null) {
+					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = ?, startDate = NULL WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime(), notificationRule.getNotificationRuleId() });
+				} else if(notificationRule.getStartDate() != null) {
+					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = NULL, startDate = ? WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getStartDate().getTime(), notificationRule.getNotificationRuleId() });
+				} else {
+					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = NULL, startDate = NULL WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationRuleId() });
+				}
 			} else {
 				//insert
-				sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,?,?)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), (notificationRule.getNotificationDate()!=null?notificationRule.getNotificationDate().getTime():null), (notificationRule.getStartDate()!=null?notificationRule.getStartDate().getTime():null) });
+				if(notificationRule.getNotificationDate() != null && notificationRule.getStartDate() != null) {
+					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,?,?)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime(), notificationRule.getStartDate().getTime() });
+				} else if(notificationRule.getNotificationDate() != null) {
+					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,?,NULL)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime() });
+				} else if(notificationRule.getStartDate() != null) {
+					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,NULL,?)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getStartDate().getTime() });
+				} else {
+					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,NULL,NULL)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval() });
+				}
+				
 				Cursor c = sqldb.rawQuery("SELECT MAX(notificationRuleId) FROM NotificationRules", null);
 				if(c.moveToFirst()) {
 					notificationRule.setNotificationRuleId(c.getLong(0));
@@ -380,6 +414,51 @@ public class DatabaseClient {
 	public void deleteDatabase() {
 		mContext.deleteDatabase(CYMDatabase.DATABASE_NAME);
 	}
+	
+	/*
+	 * Returns a hashtable containing the name of each table in the database as the key and the number of rows in that table as the value 
+	 */
+	public Hashtable<String, Long> getTableRowCounts() {
+		Hashtable<String, Long> counts = new Hashtable<String, Long>();
+		
+		SQLiteDatabase sqldb = db.getReadableDatabase();
+		try {
+			//TODO get counts from all tables (see if there is a way to query the names of the tables rather than hardcoding them  
+		}
+		finally {
+			sqldb.close();
+		}
+		
+		return counts;
+	}
+
+	/*
+	 * Returns a count of the number of rows in the specified table 
+	 */
+	public long getTableRowCount(String tableName) {
+		SQLiteDatabase sqldb = db.getReadableDatabase();
+		long count = 0;
+		try {
+			count = getTableRowCount(tableName, sqldb);
+		}
+		finally {
+			sqldb.close();
+		}
+		return count;
+	}
+	
+	/*
+	 * Returns a count of the number of rows in the specified table using the provided open readable database
+	 */
+	private long getTableRowCount(String tableName, SQLiteDatabase readableDatabase) {
+		Cursor c = readableDatabase.rawQuery("SELECT COUNT(*) FROM "+tableName, null);
+		if(c.moveToFirst()) {
+			return c.getLong(0);
+		} else {
+			return 0;
+		}
+	}
+
 
 	
 	

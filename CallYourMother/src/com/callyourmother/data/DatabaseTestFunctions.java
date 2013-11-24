@@ -1,5 +1,6 @@
 package com.callyourmother.data;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -14,6 +15,40 @@ public class DatabaseTestFunctions {
 		circle.setDescription("test 2");
 		db.saveCircle(circle);
 		db.deleteCircle(circle);
+	}
+	
+	public static void TestNotificationData(Context context) {
+		DatabaseClient db = new DatabaseClient(context);
+		Circle circle = new Circle("Test");
+		circle = db.saveCircle(circle);
+		NotificationRule circleNotificationRule = new NotificationRule();
+		circleNotificationRule.setDescription("Circle NotificationRule 1");
+		circleNotificationRule.setInterval(NotificationRule.INTERVAL_MONTHS);
+		circleNotificationRule.setType(NotificationRule.TYPE_REPEATING);
+		circleNotificationRule.setStartDate(new Date());
+		circleNotificationRule = db.saveCircleNotificationRule(circle.getCircleId(), circleNotificationRule);
+		circleNotificationRule.setDescription("Circle NotificationRule 1a");
+		circleNotificationRule = db.saveCircleNotificationRule(circle.getCircleId(), circleNotificationRule);
+		NotificationOccurrence circleNotificationOccurrence = new NotificationOccurrence(circleNotificationRule.getNotificationRuleId(), new Date(), NotificationOccurrence.ACTION_COMPLETED);
+		circleNotificationOccurrence = db.saveNotificationOccurrence(circleNotificationOccurrence);
+		db.deleteNotificationRule(circleNotificationRule.getNotificationRuleId());
+		db.deleteCircle(circle);
+		
+		List<Contact> contacts = AndroidUtility.getAndroidContacts(context);
+		Random rand = new Random();
+		Contact contact = contacts.get(rand.nextInt(contacts.size()-1));
+		NotificationRule contactNotificationRule = new NotificationRule();
+		contactNotificationRule.setDescription("Contact NotificationRule 1");
+		contactNotificationRule.setInterval(NotificationRule.INTERVAL_DATE);
+		contactNotificationRule.setType(NotificationRule.TYPE_ONETIME);
+		contactNotificationRule.setStartDate(new Date());
+		contactNotificationRule.setNotificationDate(new Date());
+		contactNotificationRule = db.saveContactNotificationRule(contact.getContactId(), contactNotificationRule);
+		contactNotificationRule.setDescription("Contact NotificationRule 1a");
+		contactNotificationRule = db.saveCircleNotificationRule(contact.getContactId(), contactNotificationRule);
+		NotificationOccurrence contactNotificationOccurrence = new NotificationOccurrence(contactNotificationRule.getNotificationRuleId(), new Date(), NotificationOccurrence.ACTION_IGNORED);
+		contactNotificationOccurrence = db.saveNotificationOccurrence(contactNotificationOccurrence);
+		db.deleteNotificationRule(contactNotificationRule.getNotificationRuleId());
 	}
 	
 	public static void CreateCircles(Context context) {
