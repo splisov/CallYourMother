@@ -46,6 +46,7 @@ public class DatabaseClient {
 				if(c.moveToFirst()) {
 					circle.setCircleId(c.getLong(0));
 				}
+				c.close();
 			}
 			sqldb.setTransactionSuccessful();
 		} finally {
@@ -89,6 +90,7 @@ public class DatabaseClient {
 				circles.add(new Circle(c.getLong(0), c.getString(1)));
 				c.moveToNext();
 			}
+			c.close();
 		} finally {
 			sqldb.close();
 		}
@@ -110,6 +112,7 @@ public class DatabaseClient {
 				contactIds.add(c.getLong(0));
 				c.moveToNext();
 			}
+			c.close();
 		} finally {
 			sqldb.close();
 		}
@@ -203,6 +206,7 @@ public class DatabaseClient {
 				circleIds.add(c.getLong(0));
 				c.moveToNext();
 			}
+			c.close();
 		} finally {
 			sqldb.close();
 		}
@@ -218,12 +222,13 @@ public class DatabaseClient {
 
 		SQLiteDatabase sqldb = db.getReadableDatabase();
 		try {
-			Cursor c = sqldb.rawQuery("SELECT notificationRuleId, description, type, interval, notificationDate, startDate FROM NotificationRules WHERE notificationRuleId IN(SELECT notificationRuleId FROM ContactNotificationRules WHERE contactId = ?)", new String[] { String.valueOf(contactId) });
+			Cursor c = sqldb.rawQuery("SELECT notificationRuleId, description, interval, intervalIncrement, startDate FROM NotificationRules WHERE notificationRuleId IN(SELECT notificationRuleId FROM ContactNotificationRules WHERE contactId = ?)", new String[] { String.valueOf(contactId) });
 			c.moveToFirst();
 			while(!c.isAfterLast()) {
-				notificationRules.add( new NotificationRule(c.getLong(0), c.getString(1), c.getInt(2), c.getInt(3), (!c.isNull(4)?new Date(c.getLong(4)):null), (!c.isNull(5)?new Date(c.getLong(5)):null)) );
+				notificationRules.add( new NotificationRule(c.getLong(0), c.getString(1), c.getInt(2), c.getInt(3), (!c.isNull(4)?new Date(c.getLong(4)):null) ));
 				c.moveToNext();
 			}
+			c.close();
 		} finally {
 			sqldb.close();
 		}
@@ -239,12 +244,13 @@ public class DatabaseClient {
 
 		SQLiteDatabase sqldb = db.getReadableDatabase();
 		try {
-			Cursor c = sqldb.rawQuery("SELECT notificationRuleId, description, type, interval, notificationDate, startDate FROM NotificationRules WHERE notificationRuleId IN(SELECT notificationRuleId FROM CircleNotificationRules WHERE circleId = ?)", new String[] { String.valueOf(circleId) });
+			Cursor c = sqldb.rawQuery("SELECT notificationRuleId, description, interval, intervalIncrement, startDate FROM NotificationRules WHERE notificationRuleId IN(SELECT notificationRuleId FROM CircleNotificationRules WHERE circleId = ?)", new String[] { String.valueOf(circleId) });
 			c.moveToFirst();
 			while(!c.isAfterLast()) {
-				notificationRules.add( new NotificationRule(c.getLong(0), c.getString(1), c.getInt(2), c.getInt(3), new Date(c.getLong(4)), new Date(c.getLong(5))) );
+				notificationRules.add( new NotificationRule(c.getLong(0), c.getString(1), c.getInt(2), c.getInt(3), (!c.isNull(4)?new Date(c.getLong(4)):null) ));
 				c.moveToNext();
 			}
+			c.close();
 		} finally {
 			sqldb.close();
 		}
@@ -261,30 +267,23 @@ public class DatabaseClient {
 		try {
 			if(notificationRule.getNotificationRuleId() > 0) {
 				//update
-				if(notificationRule.getNotificationDate() != null && notificationRule.getStartDate() != null) {
-					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = ?, startDate = ? WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime(), notificationRule.getStartDate().getTime(), notificationRule.getNotificationRuleId() });
-				} else if(notificationRule.getNotificationDate() != null) {
-					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = ?, startDate = NULL WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime(), notificationRule.getNotificationRuleId() });
-				} else if(notificationRule.getStartDate() != null) {
-					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = NULL, startDate = ? WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getStartDate().getTime(), notificationRule.getNotificationRuleId() });
+				if(notificationRule.getStartDate() != null) {
+					sqldb.execSQL("UPDATE NotificationRules SET description = ?, interval = ?, intervalIncrement = ?, startDate = ? WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getInterval(), notificationRule.getIntervalIncrement(), notificationRule.getStartDate().getTime(), notificationRule.getNotificationRuleId() });
 				} else {
-					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = NULL, startDate = NULL WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationRuleId() });
+					sqldb.execSQL("UPDATE NotificationRules SET description = ?, interval = ?, intervalIncrement = ?, startDate = NULL WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getInterval(), notificationRule.getIntervalIncrement(), notificationRule.getNotificationRuleId() });
 				}
 			} else {
 				//insert
-				if(notificationRule.getNotificationDate() != null && notificationRule.getStartDate() != null) {
-					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,?,?)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime(), notificationRule.getStartDate().getTime() });
-				} else if(notificationRule.getNotificationDate() != null) {
-					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,?,NULL)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime() });
-				} else if(notificationRule.getStartDate() != null) {
-					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,NULL,?)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getStartDate().getTime() });
+				if(notificationRule.getStartDate() != null) {
+					sqldb.execSQL("INSERT INTO NotificationRules(description,interval,intervalIncrement,startDate) VALUES(?,?,?,?)", new Object[] { notificationRule.getDescription(), notificationRule.getInterval(), notificationRule.getIntervalIncrement(), notificationRule.getStartDate().getTime() });
 				} else {
-					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,NULL,NULL)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval() });
+					sqldb.execSQL("INSERT INTO NotificationRules(description,interval,intervalIncrement,startDate) VALUES(?,?,?,NULL)", new Object[] { notificationRule.getDescription(), notificationRule.getInterval(), notificationRule.getIntervalIncrement() });
 				}
 				Cursor c = sqldb.rawQuery("SELECT MAX(notificationRuleId) FROM NotificationRules", null);
 				if(c.moveToFirst()) {
 					notificationRule.setNotificationRuleId(c.getLong(0));
 				}
+				c.close();
 				sqldb.execSQL("INSERT INTO ContactNotificationRules(contactId, notificationRuleId) VALUES(?,?)", new Object[] { contactId, notificationRule.getNotificationRuleId() });
 			}
 			sqldb.setTransactionSuccessful();
@@ -305,31 +304,24 @@ public class DatabaseClient {
 		try {
 			if(notificationRule.getNotificationRuleId() > 0) {
 				//update
-				if(notificationRule.getNotificationDate() != null && notificationRule.getStartDate() != null) {
-					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = ?, startDate = ? WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime(), notificationRule.getStartDate().getTime(), notificationRule.getNotificationRuleId() });
-				} else if(notificationRule.getNotificationDate() != null) {
-					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = ?, startDate = NULL WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime(), notificationRule.getNotificationRuleId() });
-				} else if(notificationRule.getStartDate() != null) {
-					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = NULL, startDate = ? WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getStartDate().getTime(), notificationRule.getNotificationRuleId() });
+				if(notificationRule.getStartDate() != null) {
+					sqldb.execSQL("UPDATE NotificationRules SET description = ?, interval = ?, startDate = ? WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getInterval(), notificationRule.getStartDate().getTime(), notificationRule.getNotificationRuleId() });
 				} else {
-					sqldb.execSQL("UPDATE NotificationRules SET description = ?, type = ?, interval = ?, notificationDate = NULL, startDate = NULL WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationRuleId() });
+					sqldb.execSQL("UPDATE NotificationRules SET description = ?, interval = ?, startDate = NULL WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getInterval(), notificationRule.getNotificationRuleId() });
 				}
 			} else {
 				//insert
-				if(notificationRule.getNotificationDate() != null && notificationRule.getStartDate() != null) {
-					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,?,?)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime(), notificationRule.getStartDate().getTime() });
-				} else if(notificationRule.getNotificationDate() != null) {
-					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,?,NULL)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getNotificationDate().getTime() });
-				} else if(notificationRule.getStartDate() != null) {
-					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,NULL,?)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval(), notificationRule.getStartDate().getTime() });
+				if(notificationRule.getStartDate() != null) {
+					sqldb.execSQL("INSERT INTO NotificationRules(description,interval,intervalIncrement,startDate) VALUES(?,?,?,?)", new Object[] { notificationRule.getDescription(), notificationRule.getInterval(), notificationRule.getIntervalIncrement(), notificationRule.getStartDate().getTime() });
 				} else {
-					sqldb.execSQL("INSERT INTO NotificationRules(description,type,interval,notificationDate,startDate) VALUES(?,?,?,NULL,NULL)", new Object[] { notificationRule.getDescription(), notificationRule.getType(), notificationRule.getInterval() });
+					sqldb.execSQL("INSERT INTO NotificationRules(description,interval,intervalIncrement,startDate) VALUES(?,?,?,NULL)", new Object[] { notificationRule.getDescription(), notificationRule.getInterval(), notificationRule.getIntervalIncrement() });
 				}
 				
 				Cursor c = sqldb.rawQuery("SELECT MAX(notificationRuleId) FROM NotificationRules", null);
 				if(c.moveToFirst()) {
 					notificationRule.setNotificationRuleId(c.getLong(0));
 				}
+				c.close();
 				sqldb.execSQL("INSERT INTO CircleNotificationRules(circleId, notificationRuleId) VALUES(?,?)", new Object[] { circleId, notificationRule.getNotificationRuleId() });
 			}
 			sqldb.setTransactionSuccessful();
@@ -368,12 +360,13 @@ public class DatabaseClient {
 
 		SQLiteDatabase sqldb = db.getReadableDatabase();
 		try {
-			Cursor c = sqldb.rawQuery("SELECT notificationOccurrenceId, date, action FROM NotificationOccurrences WHERE notificationRuleId ? ORDER BY date", new String[] { String.valueOf(notificationRuleId) });
+			Cursor c = sqldb.rawQuery("SELECT notificationOccurrenceId, date, action FROM NotificationOccurrences WHERE notificationRuleId = ? ORDER BY date", new String[] { String.valueOf(notificationRuleId) });
 			c.moveToFirst();
 			while(!c.isAfterLast()) {
 				notificationOccurrences.push(new NotificationOccurrence(c.getLong(0), notificationRuleId, new Date(c.getLong(1)), c.getInt(2) ) );
 				c.moveToNext();
 			}
+			c.close();
 		} finally {
 			sqldb.close();
 		}
@@ -398,6 +391,7 @@ public class DatabaseClient {
 				if(c.moveToFirst()) {
 					notificationOccurrence.setNotificationOccurrenceId(c.getLong(0));
 				}
+				c.close();
 			}
 			sqldb.setTransactionSuccessful();
 		} finally {
@@ -423,7 +417,18 @@ public class DatabaseClient {
 		
 		SQLiteDatabase sqldb = db.getReadableDatabase();
 		try {
-			//TODO get counts from all tables (see if there is a way to query the names of the tables rather than hardcoding them  
+			//TODO get counts from all tables (see if there is a way to query the names of the tables rather than hardcoding them
+			Cursor c = sqldb.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
+			if(c.moveToFirst()) {
+				while(!c.isAfterLast()) {
+					counts.put(c.getString(0), 0l);
+					c.moveToNext();
+				}
+			}
+			c.close();
+			for(String tableName : counts.keySet()) {
+				counts.put(tableName, getTableRowCount(tableName, sqldb));
+			}
 		}
 		finally {
 			sqldb.close();
@@ -452,11 +457,12 @@ public class DatabaseClient {
 	 */
 	private long getTableRowCount(String tableName, SQLiteDatabase readableDatabase) {
 		Cursor c = readableDatabase.rawQuery("SELECT COUNT(*) FROM "+tableName, null);
+		long count = 0;
 		if(c.moveToFirst()) {
-			return c.getLong(0);
-		} else {
-			return 0;
+			count = c.getLong(0);
 		}
+		c.close();
+		return count;
 	}
 
 

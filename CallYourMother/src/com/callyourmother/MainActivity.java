@@ -1,10 +1,12 @@
 package com.callyourmother;
 
+import java.util.Hashtable;
 import java.util.List;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -128,6 +130,40 @@ public class MainActivity extends Activity {
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {
 						DatabaseTestFunctions.TestNotificationData(getApplicationContext());
+						return false;
+					}
+				});
+		
+		menu.findItem(R.id.action_data_row_counts_test).setOnMenuItemClickListener(
+				new MenuItem.OnMenuItemClickListener() {
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						Hashtable<String,Long> counts = db.getTableRowCounts();
+						if(counts.size() == 0) {
+							(new AlertDialog.Builder(MainActivity.this)).setTitle("Table Row Counts").setMessage("No tables exist in database").create().show();
+						} else {
+							StringBuilder sb = new StringBuilder();
+							for(String tableName : counts.keySet()) {
+								sb.append(tableName+" = "+counts.get(tableName)+"\r\n");
+							}
+							(new AlertDialog.Builder(MainActivity.this)).setTitle("Table Row Counts").setMessage(sb.toString().trim()).create().show();
+						}
+						
+						return false;
+					}
+				});
+		
+		menu.findItem(R.id.action_data_notifications_schedule_test).setOnMenuItemClickListener(
+				new MenuItem.OnMenuItemClickListener() {
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						Hashtable<String,Boolean> testResults = DatabaseTestFunctions.TestNotificationRuleDateLogic(getApplicationContext());
+						StringBuilder sb = new StringBuilder();
+						for(String testName : testResults.keySet()) {
+							sb.append(testName+" = "+testResults.get(testName)+"\r\n");
+						}
+						(new AlertDialog.Builder(MainActivity.this)).setTitle("Notification Logic Test Results").setMessage(sb.toString().trim()).create().show();
+						
 						return false;
 					}
 				});

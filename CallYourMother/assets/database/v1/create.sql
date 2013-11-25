@@ -21,15 +21,14 @@ CREATE TABLE ContactNotificationRules(
 CREATE TABLE NotificationRules (
 	notificationRuleId integer primary key autoincrement,
 	description text,
-	type integer,				/* type constant value */
-	interval integer,			/* interval constant value */
-	notificationDate integer NULL,	/* unix timestamp */
-	startDate integer NULL		/* unix timestamp */
+	interval integer,				/* interval constant value */
+	intervalIncrement integer,		/* interval increment value */
+	startDate integer NULL			/* unix timestamp */
 );
 
 CREATE TABLE NotificationOccurrences (
 	notificationOccurrenceId integer primary key autoincrement,
 	notificationRuleId integer,
-	date integer,				/* unix timestamp */
-	action integer				/* action constant value */
+	date integer,					/* unix timestamp */
+	action integer					/* action constant value */
 );

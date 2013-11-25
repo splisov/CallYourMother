@@ -6,30 +6,47 @@ import java.util.List;
 
 public class NotificationRule {
 	
+	/*
+	 * Occurs once on a specific date
+	 */
 	public static final int INTERVAL_DATE = 1;
+	/*
+	 * Occurs every n hours, where n = intervalIncrement
+	 */
 	public static final int INTERVAL_HOURS = 2;
+	/*
+	 * Occurs every n days, where n = intervalIncrement
+	 */
 	public static final int INTERVAL_DAYS = 3;
+	/*
+	 * Occurs every n weeks, where n = intervalIncrement
+	 */
 	public static final int INTERVAL_WEEKS = 4;
+	/*
+	 * Occurs every n months, where n = intervalIncrement
+	 */
 	public static final int INTERVAL_MONTHS = 5;
+	/*
+	 * Occurs every n years, where n = intervalIncrement
+	 */
 	public static final int INTERVAL_YEARS = 6;
-	
-	public static final int TYPE_ONETIME = 1;
-	public static final int TYPE_REPEATING = 2;
 	
 	
 	private long notificationRuleId = -1;
-	private int type = -1;
-	private Date notificationDate = null;
 	private int interval = -1;
+	private int intervalIncrement = 0;
 	private Date startDate = null;
 	private String description;
 	
-	public NotificationRule() { }
-	public NotificationRule(long notificationRuleId, String description, int type, int interval, Date notificationDate, Date startDate) {
-		this.notificationRuleId = notificationRuleId;
-		this.type = type;
+	public NotificationRule(String description, int interval, int intervalIncrement, Date startDate) {
 		this.interval = interval;
-		this.notificationDate = notificationDate;
+		this.intervalIncrement = intervalIncrement;
+		this.startDate = startDate;
+	}
+	public NotificationRule(long notificationRuleId, String description, int interval, int intervalIncrement, Date startDate) {
+		this.notificationRuleId = notificationRuleId;
+		this.interval = interval;
+		this.intervalIncrement = intervalIncrement;
 		this.startDate = startDate;
 	}
 
@@ -50,14 +67,6 @@ public class NotificationRule {
 		this.description = description;
 	}
 	
-	public void setType(int type) {
-		this.type = type;
-	}
-
-	public int getType() {
-		return type;
-	}
-	
 	public int getInterval() {
 		return interval;
 	}
@@ -66,14 +75,13 @@ public class NotificationRule {
 		this.interval = interval;
 	}
 	
-	public void setNotificationDate(Date notificationDate) {
-		this.notificationDate = notificationDate;
+	public int getIntervalIncrement() {
+		return intervalIncrement;
 	}
-
-	public Date getNotificationDate() {
-		return notificationDate;
+	
+	public void setIntervalIncrement(int intervalIncrement) {
+		this.intervalIncrement = intervalIncrement;
 	}
-
 	
 	public Date getStartDate() {
 		return startDate;
@@ -83,12 +91,24 @@ public class NotificationRule {
 		this.startDate = startDate;
 	}
 	
+	/*
+	 * Returns the date for the next notification based on the history of notifications or null if no more notifications are necessary
+	 * If no history is available, the next notification will be based on the startDate
+	 */
 	public Date getNextNotification(List<NotificationOccurrence> notificationOccurrenceHistory) {
 		if(interval == NotificationRule.INTERVAL_DATE) {
 			if(notificationOccurrenceHistory == null || notificationOccurrenceHistory.size() == 0) {
-				return null;
+				return startDate;
 			} else {
-				return notificationDate;
+				NotificationOccurrence lastOccurrence = (notificationOccurrenceHistory!=null&&notificationOccurrenceHistory.size()>0?notificationOccurrenceHistory.get(notificationOccurrenceHistory.size()-1):null);
+				if(lastOccurrence.getAction() == NotificationOccurrence.ACTION_COMPLETED) {
+					return null;
+				} else {
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTime(lastOccurrence.getDate());
+					calendar.add(Calendar.DATE, 1);
+					return calendar.getTime();
+				}
 			}
 		} else {
 			NotificationOccurrence lastOccurrence = (notificationOccurrenceHistory!=null&&notificationOccurrenceHistory.size()>0?notificationOccurrenceHistory.get(notificationOccurrenceHistory.size()-1):null);
@@ -100,24 +120,28 @@ public class NotificationRule {
 			}
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(lastOccurrenceDate);
-			switch(interval) {
-				case NotificationRule.INTERVAL_HOURS:
-					calendar.add(Calendar.HOUR, interval);
-					break;
-				case NotificationRule.INTERVAL_DAYS:
-					calendar.add(Calendar.DATE, interval);
-					break;
-				case NotificationRule.INTERVAL_WEEKS:
-					calendar.add(Calendar.DATE, interval*7);
-					break;
-				case NotificationRule.INTERVAL_MONTHS:
-					calendar.add(Calendar.MONTH, interval);
-					break;
-				case NotificationRule.INTERVAL_YEARS:
-					calendar.add(Calendar.YEAR, interval);
-					break;
-				default:
-					return null;
+			if(lastOccurrence != null && lastOccurrence.getAction() == NotificationOccurrence.ACTION_IGNORED) {
+				calendar.add(Calendar.DATE, 1);
+			} else {
+				switch(interval) {
+					case NotificationRule.INTERVAL_HOURS:
+						calendar.add(Calendar.HOUR, intervalIncrement);
+						break;
+					case NotificationRule.INTERVAL_DAYS:
+						calendar.add(Calendar.DATE, intervalIncrement);
+						break;
+					case NotificationRule.INTERVAL_WEEKS:
+						calendar.add(Calendar.DATE, intervalIncrement*7);
+						break;
+					case NotificationRule.INTERVAL_MONTHS:
+						calendar.add(Calendar.MONTH, intervalIncrement);
+						break;
+					case NotificationRule.INTERVAL_YEARS:
+						calendar.add(Calendar.YEAR, intervalIncrement);
+						break;
+					default:
+						return null;
+				}
 			}
 			return calendar.getTime();
 		}

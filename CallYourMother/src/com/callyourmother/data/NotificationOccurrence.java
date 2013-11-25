@@ -4,19 +4,19 @@ import java.util.Date;
 
 public class NotificationOccurrence {
 	public static final int ACTION_COMPLETED = 1;
-	public static final int ACTION_IGNORED = 1;
+	public static final int ACTION_IGNORED = 2;
 	
 	private long notificationOccurrenceId = -1;
 	private long notificationRuleId;
 	private Date date;
 	private int action;
 	
-	public NotificationOccurrence(long notificationOccurrenceId, long notificationRuleId, Date date, int action) {
+	public NotificationOccurrence(long notificationRuleId, Date date, int action) {
 		this.notificationRuleId = notificationRuleId;
 		this.date = date;
 		this.action = action;
 	}
-	public NotificationOccurrence(long notificationRuleId, Date date, int action) {
+	public NotificationOccurrence(long notificationOccurrenceId, long notificationRuleId, Date date, int action) {
 		this.notificationRuleId = notificationRuleId;
 		this.date = date;
 		this.action = action;
