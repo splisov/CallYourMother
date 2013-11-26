@@ -25,6 +25,26 @@ public class Contact {
 		public void onContactNotFound(long contactId);
 	}
 	
+	/*
+	 * Creates a dummy contact with sample data
+	 */
+	public static Contact createDummyContact() {
+		Contact c = new Contact();
+		c.contactId = 0;
+		c.displayName = "Dummy Contact";
+		Email email = c.new Email();
+		email.address = "dummy@email.com";
+		email.type = CommonDataKinds.Email.TYPE_HOME;
+		c.emails.add(email);
+		Phone phone = c.new Phone();
+		phone.number = "5555555555";
+		phone.type = CommonDataKinds.Phone.TYPE_MOBILE;
+		c.phones.add(phone);
+		return c;
+	}
+	
+	private Contact() {}
+	
 	public Contact(long contactId, Context context) throws ContactNotFoundException {
 		
 		this.contactId = contactId;
@@ -138,6 +158,7 @@ public class Contact {
 		private int type;
 		private String customLabel;
 		
+		private Phone() {}
 		public Phone(Cursor cursor) {
 	         number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 	         type = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
@@ -147,7 +168,7 @@ public class Contact {
 	        	 customLabel = null;
 	         }
 		}
-		
+				
 		public int getType() {
 			return type;
 		}
@@ -210,6 +231,8 @@ public class Contact {
 		private int type;
 		private String customLabel;
 		
+		private Email() {}
+
 		public Email(Cursor cursor) {
 			this.address = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
 			this.type = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE));

@@ -41,12 +41,17 @@ public class DatabaseTestFunctions {
 		db.deleteCircle(circle);
 		
 		List<Contact> contacts = AndroidUtility.getAndroidContacts(context);
-		Random rand = new Random();
-		int contactIndex = 0;
-		while(contactIndex == 0) {
-			contactIndex = rand.nextInt(contacts.size()-1);
+		Contact contact;
+		if(contacts.size() > 0) {
+			Random rand = new Random();
+			int contactIndex = 0;
+			while(contactIndex == 0) {
+				contactIndex = rand.nextInt(contacts.size()-1);
+			}
+			contact = contacts.get(contactIndex);
+		} else {
+			contact = Contact.createDummyContact();
 		}
-		Contact contact = contacts.get(contactIndex);
 		NotificationRule contactNotificationRule = new NotificationRule("Contact NotificationRule 1", NotificationRule.INTERVAL_DATE, 0, new Date());
 		contactNotificationRule = db.saveContactNotificationRule(contact.getContactId(), contactNotificationRule);
 		contactNotificationRule.setDescription("Contact NotificationRule 1a");

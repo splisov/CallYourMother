@@ -93,6 +93,7 @@ public class MainActivity extends Activity {
 				@Override
 				public boolean onMenuItemClick(MenuItem item) {
 					DatabaseTestFunctions.TestCircles(getApplicationContext());
+					Toast.makeText(getApplicationContext(), "Circles Test Completed", Toast.LENGTH_SHORT).show();
 					return false;
 				}
 			});
@@ -103,6 +104,7 @@ public class MainActivity extends Activity {
 				public boolean onMenuItemClick(MenuItem item) {
 					DatabaseClient db = new DatabaseClient(getApplicationContext());
 					db.deleteDatabase();
+					Toast.makeText(getApplicationContext(), "Database Deleted", Toast.LENGTH_SHORT).show();
 					return false;
 				}
 			});
@@ -112,6 +114,7 @@ public class MainActivity extends Activity {
 				@Override
 				public boolean onMenuItemClick(MenuItem item) {
 					DatabaseTestFunctions.CreateCircles(getApplicationContext());
+					Toast.makeText(getApplicationContext(), "Sample Circles Created", Toast.LENGTH_SHORT).show();
 					return false;
 				}
 			});
@@ -121,6 +124,7 @@ public class MainActivity extends Activity {
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {
 						DatabaseTestFunctions.AddRandomContactsToCircles(getApplicationContext());
+						Toast.makeText(getApplicationContext(), "Random Contacts Added", Toast.LENGTH_SHORT).show();
 						return false;
 					}
 				});
@@ -130,6 +134,7 @@ public class MainActivity extends Activity {
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {
 						DatabaseTestFunctions.TestNotificationData(getApplicationContext());
+						Toast.makeText(getApplicationContext(), "Notification Test Successful", Toast.LENGTH_SHORT).show();
 						return false;
 					}
 				});
