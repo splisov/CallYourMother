@@ -79,6 +79,17 @@ public class MainActivity extends Activity {
 				
 			}
 		});
+		
+		Button getCallsTest = (Button) findViewById(R.id.get_calls_test);
+
+		getCallsTest.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent showCalls = new Intent(MainActivity.this, UpdateContactTransactions.class);
+				startActivity(showCalls);
+				
+			}
+		});
 	
 	}
 
