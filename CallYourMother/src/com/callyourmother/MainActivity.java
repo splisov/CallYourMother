@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
 		//creates the database client
 		db = new DatabaseClient(getApplicationContext());
 		
-		//Circle circle_data[] = new Circle[]{new Circle("Test"),new Circle("Showers")};
+		
 		mAdapter = new CircleAdapter(this, R.layout.circle_item, db.getCircles());
 			         
 		listView1 = (ListView)findViewById(R.id.listView1);		      
@@ -50,24 +50,17 @@ public class MainActivity extends Activity {
 		listView1.addFooterView(circleFooterView);
 		listView1.setAdapter(mAdapter);
 		
-	/*	notifFooterView.setOnClickListener(new OnClickListener() {
+		Button addCircleButton = (Button)findViewById(R.id.button_view);
+		
+			
+		
+		addCircleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivityForResult(new Intent(MainActivity.this,
-						NotificationActivity.class), NOTIFICATION_DRAWER);
-			}
-		});*/
-		
-		
-		
-		
-		circleFooterView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivity(new Intent(MainActivity.this,
-						AddCircleActivity.class));
+				startActivity(new Intent(MainActivity.this, AddCircleActivity.class));
 			}
 		});
+		
 		
 		Button notiTest = (Button) findViewById(R.id.notification_test);
 

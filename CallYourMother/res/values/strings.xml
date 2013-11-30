@@ -4,5 +4,11 @@
     <string name="app_name">CallYourMother</string>
     <string name="hello_world">Hello world!</string>
     <string name="add_circle">Add a New Circle</string>
-
+    <string-array name="occurance_array">
+        <item>Once</item>
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+        <item>Yearly</item>
+    </string-array>
 </resources>

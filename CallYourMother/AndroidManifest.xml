@@ -25,6 +25,8 @@
             </intent-filter>
         </activity>
         
+        <activity android:name="AddCircleActivity"></activity>
+        
         <activity
             android:name="com.callyourmother.UpdateContactTransactions"
             android:label="@string/app_name" >
