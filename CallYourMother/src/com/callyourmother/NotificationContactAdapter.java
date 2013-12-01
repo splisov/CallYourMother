@@ -16,7 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class ContactAdapter extends ArrayAdapter<Contact> {
+public class NotificationContactAdapter extends ArrayAdapter<Contact> {
 
 	private final List<Contact> mItems = new ArrayList<Contact>();
 	private final Context mContext;
@@ -24,7 +24,7 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
 	private DatabaseClient db;
 
 	
-    public ContactAdapter(Context context, int layoutResourceId) {
+    public NotificationContactAdapter(Context context, int layoutResourceId) {
         super(context, layoutResourceId);
         this.layoutResourceId = layoutResourceId;
         mContext = context;
@@ -58,7 +58,7 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
 		LinearLayout itemLayout;
 		//final Circle circle = mItems.get(position);
 
-		itemLayout = (LinearLayout) LayoutInflater.from(mContext).inflate(R.layout.contact_item, parent, false);
+		itemLayout = (LinearLayout) LayoutInflater.from(mContext).inflate(R.layout.notification_item, parent, false);
 	
 
 		TextView nameView = (TextView) itemLayout.findViewById(R.id.contact_name_view);

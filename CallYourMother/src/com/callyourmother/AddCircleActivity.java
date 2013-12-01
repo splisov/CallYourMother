@@ -50,7 +50,7 @@ public class AddCircleActivity extends Activity {
 		setContentView(R.layout.add_circle);
 		
 		db = new DatabaseClient(this.getApplicationContext());
-		mAdapter = new ContactAdapter(this, R.id.listView1);
+		mAdapter = new ContactAdapter(this, R.id.listView2);
 		
 		// Set up View
 		listView2 = (ListView)findViewById(R.id.listView2);		      
@@ -99,9 +99,9 @@ public class AddCircleActivity extends Activity {
 						String title = circleTitleText.getText().toString().trim();
 						
 						if (title.length() > 0){
-							Toast.makeText(getApplication(), title, Toast.LENGTH_LONG).show();
 							Circle newCircle = new Circle(title);
 							db.saveCircle(newCircle);
+							
 							setResult(RESULT_OK);
 							finish();
 						} else {
@@ -129,7 +129,7 @@ public class AddCircleActivity extends Activity {
 			} catch (NumberFormatException e) {
 				Log.i("DEBUG", "AddCircleActivity NumberFormatException " + e);
 			} catch (ContactNotFoundException e) {
-				Log.i("DEBUG", "AddCircleActivity ContactNotFoundException " + e);						// BEING THROWN!!!??
+				Log.i("DEBUG", "AddCircleActivity ContactNotFoundException " + e);	
 			}
 
 	    } else {  

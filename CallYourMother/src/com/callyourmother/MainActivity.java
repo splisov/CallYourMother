@@ -1,15 +1,15 @@
 package com.callyourmother;
 
 import java.util.Hashtable;
-import java.util.List;
 
-import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.view.LayoutInflater;
+import android.os.Bundle;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,7 +17,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
-import com.callyourmother.data.*;
+
+import com.callyourmother.data.DatabaseClient;
+import com.callyourmother.data.DatabaseTestFunctions;
 
 public class MainActivity extends Activity {
 
@@ -57,14 +59,23 @@ public class MainActivity extends Activity {
 		
 		listView1.setAdapter(mAdapter);
 		
+		//Add a new Circle Listener
 		Button addCircleButton = (Button)findViewById(R.id.button_view);
 		addCircleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(MainActivity.this, AddCircleActivity.class));
+				startActivityForResult(new Intent(MainActivity.this, AddCircleActivity.class), CREATE_NEW_CIRCLE);
+				
 			}
 		});
 		
+		// Notification drawer listener
+		notifFooterView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivityForResult(new Intent(MainActivity.this, NotificationActivity.class), NOTIFICATION_DRAWER);
+			}
+		});
 		
 		Button notiTest = (Button) findViewById(R.id.notification_test);
 		notiTest.setOnClickListener(new OnClickListener() {
@@ -85,6 +96,7 @@ public class MainActivity extends Activity {
 				
 			}
 		});
+	
 	
 	}
 
@@ -183,6 +195,27 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	@Override
+	protected void onResume(){
+		super.onResume();
+		Log.i("DEBUG", "In on resume");
+		
+	}
+	
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		if (requestCode == CREATE_NEW_CIRCLE && resultCode == RESULT_OK) {
+			mAdapter = new CircleAdapter(this, R.layout.circle_item, db.getCircles());  //manually update listview
+			listView1.setAdapter(mAdapter);
+
+		} else if (requestCode == NOTIFICATION_DRAWER){
+			/* CHECK IF THERE ARE STILL NOTIFICATIONS*/
+		}
+	}
+	
+	
 	public void checkCallLog(){
 		long delay = 1000L;
 		Intent startCheckContactDataIntent = new Intent(this, UpdateTransactionsService.class);

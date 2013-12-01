@@ -3,14 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#D5E4EB"
-    android:orientation="horizontal" >
-
-    <TextView
-		android:id="@+id/notif_drawer_id"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:text="Outstanding Calls:"
-		android:textSize="16dp"/>
-
+    android:orientation="vertical" >
+    
+     <ListView
+        android:id="@+id/listView3"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+   
 
 </LinearLayout>
