@@ -40,36 +40,28 @@ public class MainActivity extends Activity {
 		//creates the database client
 		db = new DatabaseClient(getApplicationContext());
 		
-		
+		         
+		// Set up adapter, add logo header, notification drawer footer, and footer buttons
 		mAdapter = new CircleAdapter(this, R.layout.circle_item, db.getCircles());
-			         
 		listView1 = (ListView)findViewById(R.id.listView1);		   
-		
-		//Add logo header
-		View header = (View)getLayoutInflater().inflate(R.layout.header, null);
+		View header = (View)getLayoutInflater().inflate(R.layout.header, null);  
 		listView1.addHeaderView(header);
-		
-		// Add notification bar footer
 		View notifFooterView = (View)getLayoutInflater().inflate(R.layout.notification_footer_view, null);
 		listView1.addFooterView(notifFooterView);
-		
-		// Add footer of buttons
 		View circleFooterView = (View)getLayoutInflater().inflate(R.layout.add_circle_footer_view, null);
 		listView1.addFooterView(circleFooterView);
-		
 		listView1.setAdapter(mAdapter);
 		
-		//Add a new Circle Listener
+		//Add Listener for "Add a New Circle" Button
 		Button addCircleButton = (Button)findViewById(R.id.button_view);
 		addCircleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivityForResult(new Intent(MainActivity.this, AddCircleActivity.class), CREATE_NEW_CIRCLE);
-				
+				startActivityForResult(new Intent(MainActivity.this, AddCircleActivity.class), CREATE_NEW_CIRCLE);	
 			}
 		});
 		
-		// Notification drawer listener
+		// Add a Listener for the Notification indicator
 		notifFooterView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -77,6 +69,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		// Tests Notification bar Notifications
 		Button notiTest = (Button) findViewById(R.id.notification_test);
 		notiTest.setOnClickListener(new OnClickListener() {
 			@Override
@@ -86,20 +79,19 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		// Listener for grabbing  user calls
 		Button getCallsTest = (Button) findViewById(R.id.get_calls_test);
-
 		getCallsTest.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent showCalls = new Intent(MainActivity.this, UpdateContactTransactions.class);
 				startActivity(showCalls);
-				
 			}
 		});
-	
-	
 	}
 
+	
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -190,8 +182,7 @@ public class MainActivity extends Activity {
 						return false;
 					}
 				});
-		
-		
+	
 		return true;
 	}
 

@@ -1,28 +1,15 @@
 package com.callyourmother;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
-
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 
 import com.callyourmother.data.Circle;
 import com.callyourmother.data.Contact;
 import com.callyourmother.data.DatabaseClient;
 import com.callyourmother.data.Contact.ContactNotFoundException;
-
-
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.Contacts;
-import android.provider.ContactsContract.Data;
-import android.provider.ContactsContract.PhoneLookup;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -36,13 +23,12 @@ import android.widget.Toast;
 
 
 public class AddCircleActivity extends Activity {
-	ListView listView2;
-	ContactAdapter mAdapter; //placeholder
 	private static final int CONTACT_PICKER_RESULT = 1001;
-	DatabaseClient db;
-	
 	private static final String CONTACT_BASE_URI = "content://com.android.contacts/data/";
-
+	
+	ListView listView2;
+	ContactAdapter mAdapter; 
+	DatabaseClient db;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,14 +50,12 @@ public class AddCircleActivity extends Activity {
 		Spinner spinner = (Spinner) findViewById(R.id.reoccuranceSpinner);
 		ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
 		        R.array.occurance_array, android.R.layout.simple_spinner_item);
-	
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(spinnerAdapter);
 		
 		
 		// Add a Contact to the List
 		TextView addContact = (TextView)findViewById(R.id.plus_contact);
-
 		addContact.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -97,11 +81,9 @@ public class AddCircleActivity extends Activity {
 					public void onClick(View v) {
 						EditText circleTitleText = (EditText)findViewById(R.id.circleText);
 						String title = circleTitleText.getText().toString().trim();
-						
 						if (title.length() > 0){
 							Circle newCircle = new Circle(title);
 							db.saveCircle(newCircle);
-							
 							setResult(RESULT_OK);
 							finish();
 						} else {
@@ -109,7 +91,6 @@ public class AddCircleActivity extends Activity {
 						}
 					}
 				});
-	
 	}
 	
 	@Override
@@ -121,7 +102,6 @@ public class AddCircleActivity extends Activity {
 	    	long contactId = Long.parseLong(contactData.toString().substring(CONTACT_BASE_URI.length()));
     		
 	    	Log.i("DEBUG", "AddCircleActivity: Contact selected with ID: " + contactId); 
-        
         
 	        try {
 				Contact newContact = new Contact(contactId, getApplicationContext());
