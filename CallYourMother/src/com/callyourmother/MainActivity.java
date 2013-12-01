@@ -41,19 +41,23 @@ public class MainActivity extends Activity {
 		
 		mAdapter = new CircleAdapter(this, R.layout.circle_item, db.getCircles());
 			         
-		listView1 = (ListView)findViewById(R.id.listView1);		      
+		listView1 = (ListView)findViewById(R.id.listView1);		   
+		
+		//Add logo header
 		View header = (View)getLayoutInflater().inflate(R.layout.header, null);
 		listView1.addHeaderView(header);
+		
+		// Add notification bar footer
 		View notifFooterView = (View)getLayoutInflater().inflate(R.layout.notification_footer_view, null);
-		View circleFooterView = (View)getLayoutInflater().inflate(R.layout.add_circle_footer_view, null);
 		listView1.addFooterView(notifFooterView);
+		
+		// Add footer of buttons
+		View circleFooterView = (View)getLayoutInflater().inflate(R.layout.add_circle_footer_view, null);
 		listView1.addFooterView(circleFooterView);
+		
 		listView1.setAdapter(mAdapter);
 		
 		Button addCircleButton = (Button)findViewById(R.id.button_view);
-		
-			
-		
 		addCircleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -63,13 +67,11 @@ public class MainActivity extends Activity {
 		
 		
 		Button notiTest = (Button) findViewById(R.id.notification_test);
-
 		notiTest.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent notiIntent = new Intent(MainActivity.this, NotifyUser.class);
 				startService(notiIntent);
-				
 			}
 		});
 		
