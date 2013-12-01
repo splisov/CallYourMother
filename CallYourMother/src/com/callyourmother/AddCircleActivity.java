@@ -39,13 +39,18 @@ public class AddCircleActivity extends Activity {
 	ListView listView2;
 	ContactAdapter mAdapter; //placeholder
 	private static final int CONTACT_PICKER_RESULT = 1001;
-	//DatabaseClient db = new DatabaseClient(this.getApplicationContext());
+	DatabaseClient db;
+	
+	private static final String CONTACT_BASE_URI = "content://com.android.contacts/data/";
 
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.add_circle);
+		
+		db = new DatabaseClient(this.getApplicationContext());
+		mAdapter = new ContactAdapter(this, R.id.listView1);
 		
 		// Set up View
 		listView2 = (ListView)findViewById(R.id.listView2);		      
@@ -96,7 +101,7 @@ public class AddCircleActivity extends Activity {
 						if (title.length() > 0){
 							Toast.makeText(getApplication(), title, Toast.LENGTH_LONG).show();
 							Circle newCircle = new Circle(title);
-							//db.saveCircle(newCircle);
+							db.saveCircle(newCircle);
 							setResult(RESULT_OK);
 							finish();
 						} else {
@@ -109,27 +114,23 @@ public class AddCircleActivity extends Activity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {  
-	    if (resultCode == RESULT_OK) {  
-	   
+	    if (resultCode == RESULT_OK) {
+	    	//get contact URI
 	    	Uri contactData = data.getData();
-	    	Cursor cur = managedQuery(contactData, null, null, null, null);
-	    	
-	    	if (cur.moveToFirst()) {
-	 	    	    String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
-	 	    	    String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-	    		
-		    	Log.i("DEBUG", "AddCircleActivity: Contact selected: " + name +" with ID: " + id); 
-	        
-	        
-		        try {
-					Contact newContact = new Contact(Long.parseLong(id), getApplicationContext());
-					mAdapter.add(newContact);
-				} catch (NumberFormatException e) {
-					Log.i("DEBUG", "AddCircleActivity NumberFormatException " + e);
-				} catch (ContactNotFoundException e) {
-					Log.i("DEBUG", "AddCircleActivity ContactNotFoundException " + e);						// BEING THROWN!!!??
-				}
-	        }
+	    	//parse contact ID from URI
+	    	long contactId = Long.parseLong(contactData.toString().substring(CONTACT_BASE_URI.length()));
+    		
+	    	Log.i("DEBUG", "AddCircleActivity: Contact selected with ID: " + contactId); 
+        
+        
+	        try {
+				Contact newContact = new Contact(contactId, getApplicationContext());
+				mAdapter.add(newContact);
+			} catch (NumberFormatException e) {
+				Log.i("DEBUG", "AddCircleActivity NumberFormatException " + e);
+			} catch (ContactNotFoundException e) {
+				Log.i("DEBUG", "AddCircleActivity ContactNotFoundException " + e);						// BEING THROWN!!!??
+			}
 
 	    } else {  
 	        Log.i("DEBUG", "AddCircleActivity: activity result not ok. Contact id: " + CONTACT_PICKER_RESULT); 
