@@ -1,23 +1,30 @@
 package com.callyourmother;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.callyourmother.data.Circle;
 import com.callyourmother.data.DatabaseClient;
 import com.callyourmother.data.DatabaseTestFunctions;
 
@@ -25,6 +32,7 @@ public class MainActivity extends Activity {
 
 	private static final int NOTIFICATION_DRAWER = 0;
 	private static final int CREATE_NEW_CIRCLE = 1;
+	private static final int EDIT_CIRCLE = 2;
 	private CircleAdapter mAdapter;
 	private ListView listView1;
 	public static final String NOTIFIED = "None";
@@ -40,7 +48,6 @@ public class MainActivity extends Activity {
 		//creates the database client
 		db = new DatabaseClient(getApplicationContext());
 		
-		         
 		// Set up adapter, add logo header, notification drawer footer, and footer buttons
 		mAdapter = new CircleAdapter(this, R.layout.circle_item, db.getCircles());
 		listView1 = (ListView)findViewById(R.id.listView1);		   
@@ -53,7 +60,7 @@ public class MainActivity extends Activity {
 		listView1.setAdapter(mAdapter);
 		
 		//Add Listener for "Add a New Circle" Button
-		Button addCircleButton = (Button)findViewById(R.id.button_view);
+		Button addCircleButton = (Button)findViewById(R.id.add_circle_button);
 		addCircleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -68,6 +75,24 @@ public class MainActivity extends Activity {
 				startActivityForResult(new Intent(MainActivity.this, NotificationActivity.class), NOTIFICATION_DRAWER);
 			}
 		});
+		
+
+		//Listener for listView item selection
+		listView1.setOnItemClickListener(new OnItemClickListener(){
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position,
+					long id) {
+				Log.i("DEBUG", "Item selected at position " + position);
+				
+				List<Circle> circles = db.getCircles();
+				Circle curr = circles.get(position - 1);
+				Intent listItemIntent = new Intent(MainActivity.this, ViewCircle.class);
+				listItemIntent.putExtra("circle_id", curr.getCircleId());
+				listItemIntent.putExtra("circle_description", curr.getDescription());
+				startActivityForResult(listItemIntent, EDIT_CIRCLE);
+				
+			}}
+		);
 		
 		// Tests Notification bar Notifications
 		Button notiTest = (Button) findViewById(R.id.notification_test);
@@ -89,6 +114,8 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
+	
+    
 
 	
 	
@@ -197,7 +224,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-		if (requestCode == CREATE_NEW_CIRCLE && resultCode == RESULT_OK) {
+		if ((requestCode == CREATE_NEW_CIRCLE || requestCode == EDIT_CIRCLE) && resultCode == RESULT_OK) {
 			mAdapter = new CircleAdapter(this, R.layout.circle_item, db.getCircles());  //manually update listview
 			listView1.setAdapter(mAdapter);
 

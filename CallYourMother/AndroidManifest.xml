@@ -27,6 +27,8 @@
         
         <activity android:name="AddCircleActivity"></activity>
          <activity android:name="NotificationActivity"></activity>
+          <activity android:name="ViewCircle"></activity>
+           <activity android:name="EditCircleActivity"></activity>
         
         <activity
             android:name="com.callyourmother.UpdateContactTransactions"

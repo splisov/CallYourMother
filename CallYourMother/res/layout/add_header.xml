@@ -9,14 +9,17 @@
             android:id="@+id/circleLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+             android:paddingLeft="5dp"
             android:text="Circle Name" 
-            android:textSize="20dp"
+            android:textSize="18dp"
             android:textColor="#000000"/>
         
        <EditText
 	        android:id="@+id/circleText"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
+	         android:paddingLeft="5dp"
 	        android:textColor="#000000"
 	        android:ems="10" >
 	        <requestFocus />
@@ -26,14 +29,16 @@
             android:id="@+id/intervalLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+             android:paddingLeft="5dp"
             android:text="Occurance" 
-           	android:paddingTop="15dp"
+           	android:paddingTop="5dp"
  	        android:textColor="#000000"          	
-            android:textSize="20dp"/>
+            android:textSize="18dp"/>
 
         <Spinner
             android:id="@+id/reoccuranceSpinner"
             android:textColor="#000000" 
+             android:paddingLeft="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         
@@ -41,9 +46,10 @@
             android:id="@+id/ContactsLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+             android:paddingLeft="5dp"
             android:text="Contacts" 
 	        android:textColor="#000000"            
-           	android:paddingTop="15dp"
-            android:textSize="20dp"/>
+           	android:paddingTop="5dp"
+            android:textSize="18dp"/>
   
 	</LinearLayout>
