@@ -53,7 +53,7 @@ public class Contact {
 		Uri photoUri = null;
 		
 		//get general info
-		Cursor contact = context.getContentResolver().query( ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts._ID +" = "+ contactId, null, null);
+		Cursor contact = context.getContentResolver().query( ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts._ID +" = ?", new String[] { String.valueOf(contactId) }, null);
 		if(contact.moveToFirst()) {
 			displayName = contact.getString(contact.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 			hasPhoneNumber = Boolean.parseBoolean(contact.getString(contact.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));

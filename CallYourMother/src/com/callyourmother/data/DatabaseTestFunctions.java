@@ -7,6 +7,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 
+import com.callyourmother.data.Contact.ContactNotFoundException;
+
 import android.content.Context;
 
 
@@ -43,6 +45,13 @@ public class DatabaseTestFunctions {
 		List<Contact> contacts = AndroidUtility.getAndroidContacts(context);
 		Contact contact;
 		if(contacts.size() > 0) {
+			//test reloading contact
+			try {
+				contact = new Contact(contacts.get(0).getContactId(), context);
+			} catch (ContactNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			Random rand = new Random();
 			int contactIndex = 0;
 			while(contactIndex == 0) {
