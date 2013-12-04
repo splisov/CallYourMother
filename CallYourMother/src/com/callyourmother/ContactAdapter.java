@@ -8,6 +8,7 @@ import com.callyourmother.data.Contact;
 import com.callyourmother.data.DatabaseClient;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,14 +59,18 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
 		LinearLayout itemLayout;
 		//final Circle circle = mItems.get(position);
 
+		Log.i("DEBUG", "Getting LayoutView for Contact");
+		
 		itemLayout = (LinearLayout) LayoutInflater.from(mContext).inflate(R.layout.contact_item, parent, false);
 	
 
 		TextView nameView = (TextView) itemLayout.findViewById(R.id.contact_name_view);
 		nameView.setText(getItem(position).getDisplayName());
+	
 		
 		TextView numberView = (TextView) itemLayout.findViewById(R.id.contact_number_view);
-		numberView.setText(getItem(position).getPhones().get(0).toString()); //just display first number
+		numberView.setText(getItem(position).getPhones().toString()); //ONLY GRAB FIRST CONTACT
+		
 		
 		ImageView photoView = (ImageView) itemLayout.findViewById(R.id.contact_image_view);
 		photoView.setImageBitmap(getItem(position).getPhoto());

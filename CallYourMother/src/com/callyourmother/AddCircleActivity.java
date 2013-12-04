@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -40,7 +41,8 @@ public class AddCircleActivity extends Activity {
 		
 		
 		db = new DatabaseClient(this.getApplicationContext());
-		mAdapter = new ContactAdapter(this, R.id.listView2);
+		mAdapter = new ContactAdapter(this, R.layout.contact_item);
+	
 		contactIdList = new ArrayList<Long>();
 		
 		// Set up View
@@ -108,14 +110,15 @@ public class AddCircleActivity extends Activity {
 	    	//get contact URI
 	    	Uri contactData = data.getData();
 	    	//parse contact ID from URI
-	    	long contactId = Long.parseLong(contactData.toString().substring(CONTACT_BASE_URI.length()));
+	    	String contactId = contactData.toString().substring(CONTACT_BASE_URI.length());
     		
-	    	Log.i("DEBUG", "AddCircleActivity: Contact selected with ID: " + contactData.toString() + " " + contactId); 
-        
+	    	Log.i("DEBUG", "AddCircleActivity: Contact selected with ID: " +  contactId); 
+	    	
+	         
 	        try {
-				Contact newContact = new Contact(contactId, this.getApplicationContext());
+				Contact newContact = new Contact(Long.parseLong(contactId), this.getApplicationContext());
 				mAdapter.add(newContact);
-				contactIdList.add(contactId);
+				//contactIdList.add(Long.parseLong(contactId));
 			} catch (NumberFormatException e) {
 				Log.i("DEBUG", "AddCircleActivity NumberFormatException " + e);
 			} catch (ContactNotFoundException e) {
