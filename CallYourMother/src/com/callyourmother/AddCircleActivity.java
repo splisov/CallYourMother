@@ -106,6 +106,7 @@ public class AddCircleActivity extends Activity {
 								Log.i("DEBUG", "adding the contact");
 								db.saveCircleContact(newCircle.getCircleId(), CircleContacts.get(i));
 								db.saveContactNotificationRule(CircleContacts.get(i), notifRule);
+								db.saveCircleNotificationRule(newCircle.getCircleId(), notifRule);
 							}
 							setResult(RESULT_OK);
 							finish();
