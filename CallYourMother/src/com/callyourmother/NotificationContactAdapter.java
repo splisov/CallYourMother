@@ -8,6 +8,10 @@ import com.callyourmother.data.Contact;
 import com.callyourmother.data.DatabaseClient;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,13 +66,18 @@ public class NotificationContactAdapter extends ArrayAdapter<Contact> {
 	
 
 		TextView nameView = (TextView) itemLayout.findViewById(R.id.contact_name_view);
-	//	nameView.setText(getItem(position).getDisplayName());
+		nameView.setText(getItem(position).getDisplayName());
 		
 		TextView numberView = (TextView) itemLayout.findViewById(R.id.contact_number_view);
-	//	numberView.setText(getItem(position).getPhones().get(0).toString()); //just display first number
+		numberView.setText(getItem(position).getAllPhoneNumbers()); //ONLY GRAB FIRST CONTACT
 		
 		ImageView photoView = (ImageView) itemLayout.findViewById(R.id.contact_image_view);
-	//	photoView.setImageBitmap(getItem(position).getPhoto());
+		
+		if (getItem(position).getPhoto() == null){
+			photoView.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.android));
+		} else {
+			photoView.setImageBitmap(getItem(position).getPhoto());
+		}
 		
 		
 		return itemLayout;

@@ -8,6 +8,7 @@ import com.callyourmother.data.Contact;
 import com.callyourmother.data.DatabaseClient;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -74,7 +75,11 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
 		
 		
 		ImageView photoView = (ImageView) itemLayout.findViewById(R.id.contact_image_view);
-		photoView.setImageBitmap(getItem(position).getPhoto());
+		if (getItem(position).getPhoto() == null){
+			photoView.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.android));
+		} else {
+			photoView.setImageBitmap(getItem(position).getPhoto());
+		}
 		
 		TextView deleteContact = (TextView) itemLayout.findViewById(R.id.delete_contact_view);
 		deleteContact.setOnClickListener(new OnClickListener() {

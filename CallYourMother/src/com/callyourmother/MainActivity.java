@@ -224,7 +224,8 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-		if ((requestCode == CREATE_NEW_CIRCLE || requestCode == EDIT_CIRCLE) && resultCode == RESULT_OK) {
+		if ((requestCode == CREATE_NEW_CIRCLE || requestCode == EDIT_CIRCLE || requestCode == EDIT_CIRCLE) 
+				&& resultCode == RESULT_OK) {
 			mAdapter = new CircleAdapter(this, R.layout.circle_item, db.getCircles());  //manually update listview
 			listView1.setAdapter(mAdapter);
 

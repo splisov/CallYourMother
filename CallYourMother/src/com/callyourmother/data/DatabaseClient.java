@@ -75,6 +75,25 @@ public class DatabaseClient {
 			}
 		}
 	}
+	
+	public void deleteCircle(Long circleId) {
+		if(circleId > 0) {
+			SQLiteDatabase sqldb = db.getWritableDatabase();
+			sqldb.beginTransaction();
+			try {
+				//delete
+				sqldb.execSQL("DELETE FROM CircleContacts WHERE circleId = ?", new Object[] { circleId });
+				sqldb.execSQL("DELETE FROM NotificationOccurrences WHERE notificationRuleId IN(SELECT notificationRuleId FROM CircleNotificationRules WHERE circleId = ?)", new Object[] { circleId });
+				sqldb.execSQL("DELETE FROM NotificationRules WHERE notificationRuleId IN(SELECT notificationRuleId FROM CircleNotificationRules WHERE circleId = ?)", new Object[] { circleId });
+				sqldb.execSQL("DELETE FROM CircleNotificationRules WHERE circleId = ?", new Object[] { circleId });
+				sqldb.execSQL("DELETE FROM Circles WHERE circleId = ?", new Object[] { circleId });
+				sqldb.setTransactionSuccessful();
+			} finally {
+				sqldb.endTransaction();
+				sqldb.close();
+			}
+		}
+	}
 
 	/*
 	 * returns a list of circles from database

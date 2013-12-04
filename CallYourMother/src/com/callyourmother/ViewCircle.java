@@ -31,7 +31,7 @@ public class ViewCircle extends Activity {
 
 		// Grab necessary extras
 		Bundle b = getIntent().getExtras();
-		long cId = b.getLong("circle_id");
+		final long cId = b.getLong("circle_id");
 		String title = b.getString("circle_description");
 		
 		// Set up View
@@ -76,7 +76,9 @@ public class ViewCircle extends Activity {
 		deleteCircleButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				//db.deleteCircle(circle)
+				db.deleteCircle(cId);
+				setResult(RESULT_OK);
+				finish();
 			}
 		});
 		
