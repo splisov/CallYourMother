@@ -1,6 +1,8 @@
 package com.callyourmother;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,6 +15,8 @@ import com.callyourmother.data.Circle;
 import com.callyourmother.data.Contact;
 import com.callyourmother.data.DatabaseClient;
 import com.callyourmother.data.Contact.ContactNotFoundException;
+import com.callyourmother.data.NotificationRule;
+
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,7 +36,7 @@ public class AddCircleActivity extends Activity {
 	ListView listView2;
 	ContactAdapter mAdapter; 
 	DatabaseClient db;
-	ArrayList<Long> contactIdList;
+	ArrayList<Long> CircleContacts;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +47,7 @@ public class AddCircleActivity extends Activity {
 		db = new DatabaseClient(this.getApplicationContext());
 		mAdapter = new ContactAdapter(this, R.layout.contact_item);
 	
-		contactIdList = new ArrayList<Long>();
+		CircleContacts = new ArrayList<Long>();
 		
 		// Set up View
 		listView2 = (ListView)findViewById(R.id.listView2);		      
@@ -89,12 +93,20 @@ public class AddCircleActivity extends Activity {
 						EditText circleTitleText = (EditText)findViewById(R.id.circleText);
 						String title = circleTitleText.getText().toString().trim();
 						Spinner mySpinner = (Spinner)findViewById(R.id.reoccuranceSpinner);
-						String reoccurance = mySpinner.getSelectedItem().toString();
+						String reoccuranceString = mySpinner.getSelectedItem().toString();
+						int reoccurance = notificationRule(reoccuranceString);
+						NotificationRule notifRule = new NotificationRule(title, 1, reoccurance, new Date(System.currentTimeMillis()));
+						
 						
 						if (title.length() > 0){
 							Circle newCircle = new Circle(title);
 							db.saveCircle(newCircle);
-							//set reoccurance for each contact
+
+							for (int i = 0; i < CircleContacts.size(); i++){
+								Log.i("DEBUG", "adding the contact");
+								db.saveCircleContact(newCircle.getCircleId(), CircleContacts.get(i));
+								db.saveContactNotificationRule(CircleContacts.get(i), notifRule);
+							}
 							setResult(RESULT_OK);
 							finish();
 						} else {
@@ -107,29 +119,38 @@ public class AddCircleActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {  
 	    if (resultCode == RESULT_OK) {
-	    	//get contact URI
 	    	Uri contactData = data.getData();
-	    	//parse contact ID from URI
 	    	String contactId = contactData.toString().substring(CONTACT_BASE_URI.length());
-    		
-	    	Log.i("DEBUG", "AddCircleActivity: Contact selected with ID: " +  contactId); 
-	    	
-	         
+	        
 	        try {
 				Contact newContact = new Contact(Long.parseLong(contactId), this.getApplicationContext());
 				mAdapter.add(newContact);
-				//contactIdList.add(Long.parseLong(contactId));
+				CircleContacts.add(Long.parseLong(contactId));
 			} catch (NumberFormatException e) {
 				Log.i("DEBUG", "AddCircleActivity NumberFormatException " + e);
 			} catch (ContactNotFoundException e) {
 				Log.i("DEBUG", "AddCircleActivity ContactNotFoundException " + e);	
 			}
-
 	    } else {  
 	        Log.i("DEBUG", "AddCircleActivity: activity result not ok. Contact id: " + CONTACT_PICKER_RESULT); 
-	      
 	    }  
 	}  
 	
+	
+	private int notificationRule(String s){
+		
+		if (s.equals("Once")){
+			return 1;
+		} else if (s.equals("Daily")){
+			return 3;
+		} else if (s.equals("Weekly")){
+			return 4;
+		} else if (s.equals("Monthly")){
+			return 5;
+		} else if (s.equals("Yearly")){
+			return 6;
+		}
+		return 0;		
+	}
 
 }

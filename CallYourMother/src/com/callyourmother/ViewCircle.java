@@ -27,7 +27,7 @@ public class ViewCircle extends Activity {
 		setContentView(R.layout.notification_drawer);
 		
 		db = new DatabaseClient(getApplicationContext());
-		mAdapter = new NotificationContactAdapter(this, R.id.listView3);
+		mAdapter = new NotificationContactAdapter(this, R.layout.notification_item);
 
 		// Grab necessary extras
 		Bundle b = getIntent().getExtras();
@@ -46,15 +46,31 @@ public class ViewCircle extends Activity {
 		TextView circleTitleView = (TextView)findViewById(R.id.circle_title_view);
 		circleTitleView.setText(title + " Circle");
 		
+		TextView notificationView = (TextView)findViewById(R.id.detail_view);
+		//notificationView.setText(Notification Rule);
+		
+		
 		List<Contact> contacts = db.getCircleContacts(cId, getApplicationContext());
-		Log.i("DEBUG", cId + "");
+		List<Long> contactIds = db.getCircleContactIds(cId); 
+		
+		if (contactIds != null){
+			Log.i("DEBUG", "Number of contact ids: " + contactIds.size());
+		}
+		
+		if (db.getCircleContacts(cId, getApplicationContext()) == null){
+			Log.i("DEBUG", "NULL CONTACTS");
+		}
+		
+		Log.i("DEBUG", "This is Circle id #" + cId);
+		
+		
 		
 		if (contacts != null){
 			for (int i = 0; i < contacts.size(); i++){	//NOT WORKING
 				contacts.get(i);
 				mAdapter.add(contacts.get(i));
 			}
-		}
+		} 
 	
 		Button deleteCircleButton = (Button)findViewById(R.id.delete_circle_button);
 		deleteCircleButton.setOnClickListener(new OnClickListener() {

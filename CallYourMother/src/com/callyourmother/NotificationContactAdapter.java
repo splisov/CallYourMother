@@ -58,17 +58,17 @@ public class NotificationContactAdapter extends ArrayAdapter<Contact> {
 		LinearLayout itemLayout;
 		//final Circle circle = mItems.get(position);
 
-		itemLayout = (LinearLayout) LayoutInflater.from(mContext).inflate(R.layout.notification_item, parent, false);
+		itemLayout = (LinearLayout) LayoutInflater.from(mContext).inflate(R.layout.contact_item, parent, false);
 	
 
 		TextView nameView = (TextView) itemLayout.findViewById(R.id.contact_name_view);
-		nameView.setText(getItem(position).getDisplayName());
+	//	nameView.setText(getItem(position).getDisplayName());
 		
 		TextView numberView = (TextView) itemLayout.findViewById(R.id.contact_number_view);
-		numberView.setText(getItem(position).getPhones().get(0).toString()); //just display first number
+	//	numberView.setText(getItem(position).getPhones().get(0).toString()); //just display first number
 		
 		ImageView photoView = (ImageView) itemLayout.findViewById(R.id.contact_image_view);
-		photoView.setImageBitmap(getItem(position).getPhoto());
+	//	photoView.setImageBitmap(getItem(position).getPhoto());
 		
 		
 		return itemLayout;

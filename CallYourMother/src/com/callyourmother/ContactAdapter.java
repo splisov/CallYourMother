@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,7 +30,7 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
         super(context, layoutResourceId);
         this.layoutResourceId = layoutResourceId;
         mContext = context;
-        //this.db = new DatabaseClient(context);
+        this.db = new DatabaseClient(context);
         
     }
 
@@ -74,6 +75,15 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
 		
 		ImageView photoView = (ImageView) itemLayout.findViewById(R.id.contact_image_view);
 		photoView.setImageBitmap(getItem(position).getPhoto());
+		
+		TextView deleteContact = (TextView) itemLayout.findViewById(R.id.delete_contact_view);
+		deleteContact.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						
+						
+					}
+		});
 		
 		
 		return itemLayout;
