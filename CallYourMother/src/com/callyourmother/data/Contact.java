@@ -1,5 +1,6 @@
 package com.callyourmother.data;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
+import android.provider.ContactsContract.Contacts;
 
 
 public class Contact {
@@ -44,19 +46,23 @@ public class Contact {
 		return c;
 	}
 	
+	private static final String[] CONTACT_PROJECTION = new String[] {
+		ContactsContract.Contacts.DISPLAY_NAME,
+		ContactsContract.Contacts.PHOTO_THUMBNAIL_URI,
+	};
+	
 	private Contact() {}
 	
 	public Contact(long contactId, Context context) throws ContactNotFoundException {
 		
 		this.contactId = contactId;
 		
-		boolean hasPhoneNumber = false;
 		Uri photoUri = null;
 		
 		//get general info
 		
 		Cursor contact = context.getContentResolver().query                                     //This query now working
-				(android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, 
+				(android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI, CONTACT_PROJECTION, 
 						android.provider.ContactsContract.CommonDataKinds.Phone._ID + "=?", 
 						new String[]{String.valueOf(contactId)}, null);
         
@@ -64,37 +70,69 @@ public class Contact {
 		//Cursor contact = context.getContentResolver().query( ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts._ID +" = ?", new String[] { String.valueOf(contactId) }, null);
 		if(contact.moveToFirst()) {
 			displayName = contact.getString(contact.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-			hasPhoneNumber = Boolean.parseBoolean(contact.getString(contact.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
-			photoUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
-		
-			//get phones
-			if(hasPhoneNumber) {
-				Cursor phones = context.getContentResolver().query( ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ contactId, null, null); 
-				while (phones.moveToNext()) {
-					  this.phones.add(new Phone(phones));
-				} 
-				phones.close();
+			if(!contact.isNull(contact.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI))) {
+				photoUri = Uri.parse(contact.getString(contact.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI)));
 			}
+			contact.close();
+			
+			//get phones
+			Cursor phones = context.getContentResolver().query( Uri.withAppendedPath(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, String.valueOf(contactId)), null, null, null, null);
+			while (phones.moveToNext()) {
+				  this.phones.add(new Phone(phones));
+			} 
+			phones.close();
 			
 			//get emails
-			Cursor emails = context.getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId, null, null); 
+			Cursor emails = context.getContentResolver().query( Uri.withAppendedPath(ContactsContract.CommonDataKinds.Email.CONTENT_URI, String.valueOf(contactId)), null, null, null, null);
 			while (emails.moveToNext()) { 
 				this.emails.add(new Email(emails));
-			} 
+			}
 			emails.close();
 			
 			//get photo
 			if (photoUri != null) {
-		        InputStream photoStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(), photoUri);
-		        if (photoStream != null) {
-		            photo = BitmapFactory.decodeStream(photoStream);
-		        }
+				Cursor photoCursor = context.getContentResolver().query(photoUri, new String[] { Contacts.Photo.PHOTO }, null, null, null);
+				if(photoCursor != null && photoCursor.moveToFirst()) {
+					byte[] photoData = photoCursor.getBlob(0);
+					if(photoData != null) {
+						photo = BitmapFactory.decodeStream(new ByteArrayInputStream(photoData));
+					}
+				}
+				photoCursor.close();
 		    }
 		} else {
+			contact.close();
 			throw new ContactNotFoundException(contactId);
 		}
 	}
 	
+	public String getAllPhoneNumbers() {
+		StringBuilder sb = new StringBuilder();
+		int count = 0;
+		String newline = System.getProperty("line.separator");
+		for(Phone p : this.phones) {
+			if(count > 0) {
+				sb.append(newline);
+			}
+			sb.append(p.getNumber()+" ("+p.getLabel()+")");
+			count++;
+		}
+		return sb.toString();
+	}
+
+	public String getAllEmailsNumbers() {
+		StringBuilder sb = new StringBuilder();
+		int count = 0;
+		String newline = System.getProperty("line.separator");
+		for(Email e : this.emails) {
+			if(count > 0) {
+				sb.append(newline);
+			}
+			sb.append(e.getAddress()+" ("+e.getLabel()+")");
+			count++;
+		}
+		return sb.toString();
+	}	
 	public class ContactNotFoundException extends Exception {
 
 		private static final long serialVersionUID = 1L;
@@ -188,45 +226,45 @@ public class Contact {
 		public String getLabel() {
 			switch(type) {
 			case CommonDataKinds.Phone.TYPE_ASSISTANT:
-				return "ASSISTANT";
+				return "Assistant";
 			case CommonDataKinds.Phone.TYPE_CALLBACK:
-				return "CALLBACK";
+				return "Callback";
 			case CommonDataKinds.Phone.TYPE_CAR:
-				return "CAR";
+				return "Car";
 			case CommonDataKinds.Phone.TYPE_COMPANY_MAIN:
-				return "COMPANY_MAIN";
+				return "Company Main";
 			case CommonDataKinds.Phone.TYPE_FAX_HOME:
-				return "FAX_HOME";
+				return "Fax Home";
 			case CommonDataKinds.Phone.TYPE_FAX_WORK:
-				return "FAX_WORK";
+				return "Fax Work";
 			case CommonDataKinds.Phone.TYPE_HOME:
-				return "HOME";
+				return "Home";
 			case CommonDataKinds.Phone.TYPE_ISDN:
 				return "ISDN";
 			case CommonDataKinds.Phone.TYPE_MAIN:
-				return "MAIN";
+				return "Main";
 			case CommonDataKinds.Phone.TYPE_MMS:
 				return "MMS";
 			case CommonDataKinds.Phone.TYPE_MOBILE:
-				return "MOBILE";
+				return "Mobile";
 			case CommonDataKinds.Phone.TYPE_OTHER:
-				return "OTHER";
+				return "Other";
 			case CommonDataKinds.Phone.TYPE_OTHER_FAX:
-				return "OTHER_FAX";
+				return "Other Fax";
 			case CommonDataKinds.Phone.TYPE_PAGER:
-				return "PAGER";
+				return "Pager";
 			case CommonDataKinds.Phone.TYPE_RADIO:
-				return "RADIO";
+				return "Radio";
 			case CommonDataKinds.Phone.TYPE_TELEX:
 				return "TELEX";
 			case CommonDataKinds.Phone.TYPE_TTY_TDD:
-				return "TTY_TDD";
+				return "TTY-TDD";
 			case CommonDataKinds.Phone.TYPE_WORK:
-				return "WORK";
+				return "Work";
 			case CommonDataKinds.Phone.TYPE_WORK_MOBILE:
-				return "WORK_MOBILE";
+				return "Work Mobile";
 			case CommonDataKinds.Phone.TYPE_WORK_PAGER:
-				return "WORK_PAGER";
+				return "Work Pager";
 			case CommonDataKinds.Phone.TYPE_CUSTOM:
 			default:
 				return customLabel;
@@ -263,13 +301,13 @@ public class Contact {
 		public String getLabel() {
 			switch(type) {
 			case CommonDataKinds.Email.TYPE_HOME:
-				return "HOME";
+				return "Home";
 			case CommonDataKinds.Email.TYPE_MOBILE:
-				return "MOBILE";
+				return "Mobile";
 			case CommonDataKinds.Email.TYPE_OTHER:
-				return "OTHER";
+				return "Other";
 			case CommonDataKinds.Email.TYPE_WORK:
-				return "WORK";
+				return "Work";
 			case CommonDataKinds.Email.TYPE_CUSTOM:
 			default:
 				return customLabel;

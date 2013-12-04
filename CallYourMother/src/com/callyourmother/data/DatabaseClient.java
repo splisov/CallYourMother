@@ -134,7 +134,7 @@ public class DatabaseClient {
 				deleteContactData(contactId);
 			}
 		}
-		return null;
+		return contacts;
 	}
 	
 	/*

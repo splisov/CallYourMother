@@ -70,7 +70,7 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
 	
 		
 		TextView numberView = (TextView) itemLayout.findViewById(R.id.contact_number_view);
-		numberView.setText(getItem(position).getPhones().toString()); //ONLY GRAB FIRST CONTACT
+		numberView.setText(getItem(position).getAllPhoneNumbers()); //ONLY GRAB FIRST CONTACT
 		
 		
 		ImageView photoView = (ImageView) itemLayout.findViewById(R.id.contact_image_view);
