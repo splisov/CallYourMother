@@ -120,7 +120,7 @@ public class Contact {
 		return sb.toString();
 	}
 
-	public String getAllEmailsNumbers() {
+	public String getAllEmailAddresses() {
 		StringBuilder sb = new StringBuilder();
 		int count = 0;
 		String newline = System.getProperty("line.separator");
