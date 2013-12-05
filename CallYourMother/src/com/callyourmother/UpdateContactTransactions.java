@@ -57,6 +57,11 @@ public class UpdateContactTransactions extends Activity {
 		super.onStop();
 	}
 
+	private void getContactStats(){
+		
+	}
+	
+	@SuppressWarnings("deprecation")
 	private void getCallDetails() {
 
 		StringBuffer sb = new StringBuffer();

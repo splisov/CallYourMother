@@ -39,7 +39,7 @@ public class NotifyUser extends IntentService {
 		// Gets an instance of the NotificationManager service
 		NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		// Builds the notification and issues it.
-		mNotifyMgr.notify(mNotificationId, mBuilder.build());
+		mNotifyMgr.notify(mNotificationId, mBuilder.getNotification());
 	}
 
 	@Override

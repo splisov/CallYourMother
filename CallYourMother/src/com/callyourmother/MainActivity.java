@@ -85,12 +85,13 @@ public class MainActivity extends Activity {
 				Log.i("DEBUG", "Item selected at position " + position);
 				
 				List<Circle> circles = db.getCircles();
-				Circle curr = circles.get(position - 1);
-				Intent listItemIntent = new Intent(MainActivity.this, ViewCircle.class);
-				listItemIntent.putExtra("circle_id", curr.getCircleId());
-				listItemIntent.putExtra("circle_description", curr.getDescription());
-				startActivityForResult(listItemIntent, EDIT_CIRCLE);
-				
+				if (position < circles.size() && position > 0) {
+					Circle curr = circles.get(position - 1);
+					Intent listItemIntent = new Intent(MainActivity.this, ViewCircle.class);
+					listItemIntent.putExtra("circle_id", curr.getCircleId());
+					listItemIntent.putExtra("circle_description", curr.getDescription());
+					startActivityForResult(listItemIntent, EDIT_CIRCLE);
+				}
 			}}
 		);
 		
