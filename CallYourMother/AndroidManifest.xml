@@ -25,10 +25,10 @@
             </intent-filter>
         </activity>
         
-        <activity android:name="AddCircleActivity"></activity>
-         <activity android:name="NotificationActivity"></activity>
-          <activity android:name="ViewCircle"></activity>
-           <activity android:name="EditCircleActivity"></activity>
+        <activity android:name="com.callyourmother.AddCircleActivity"></activity>
+         <activity android:name="com.callyourmother.NotificationActivity"></activity>
+          <activity android:name="com.callyourmother.ViewCircle"></activity>
+           <activity android:name="com.callyourmother.EditCircleActivity"></activity>
         
         <activity
             android:name="com.callyourmother.UpdateContactTransactions"
