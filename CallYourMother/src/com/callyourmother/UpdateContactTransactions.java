@@ -1,6 +1,12 @@
 package com.callyourmother;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import android.app.Activity;
 import android.database.Cursor;
@@ -11,6 +17,10 @@ import android.widget.TextView;
 public class UpdateContactTransactions extends Activity {
 
 	TextView call;
+	private HashMap<String, Integer> timesContactCalled;
+	private HashMap<String, Integer> contactNumberDate;
+	private HashMap<String, String> contactNameNumber;
+	private int minCallLength = 15;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +56,12 @@ public class UpdateContactTransactions extends Activity {
 	@Override
 	protected void onStart() {
 		// TODO Auto-generated method stub
-		super.onStart();
+		super.onStart(); //Fix this
 		call = (TextView) findViewById(R.id.call);
+		if (null == timesContactCalled){
+			timesContactCalled = new HashMap<String, Integer>();
+			contactNameNumber = new HashMap<String, String>();
+		}
 		getCallDetails();
 	}
 
@@ -57,7 +71,7 @@ public class UpdateContactTransactions extends Activity {
 		super.onStop();
 	}
 
-	private void getContactStats(){
+	private void updateNotification(String number){
 		
 	}
 	
@@ -65,18 +79,27 @@ public class UpdateContactTransactions extends Activity {
 	private void getCallDetails() {
 
 		StringBuffer sb = new StringBuffer();
-		Cursor managedCursor = managedQuery( CallLog.Calls.CONTENT_URI,null, null,null, null);
+		Cursor managedCursor = managedQuery( CallLog.Calls.CONTENT_URI,null, null,null, CallLog.Calls.DATE+" DESC");
 		int number = managedCursor.getColumnIndex( CallLog.Calls.NUMBER ); 
 		int type = managedCursor.getColumnIndex( CallLog.Calls.TYPE );
 		int date = managedCursor.getColumnIndex( CallLog.Calls.DATE);
 		int duration = managedCursor.getColumnIndex( CallLog.Calls.DURATION);
+		int name = managedCursor.getColumnIndex( CallLog.Calls.CACHED_NAME);
+		
 		sb.append( "Call Details :");
+		ArrayList<String> arr = new ArrayList<String>(); 
 		while ( managedCursor.moveToNext() ) {
 			String phNumber = managedCursor.getString( number );
 			String callType = managedCursor.getString( type );
 			String callDate = managedCursor.getString( date );
 			Date callDayTime = new Date(Long.valueOf(callDate));
 			String callDuration = managedCursor.getString( duration );
+			String callName = managedCursor.getString( name );
+			
+			if (Integer.valueOf(callDuration)<minCallLength){
+				continue;
+			}
+			
 			String dir = null;
 			int dircode = Integer.parseInt( callType );
 			switch( dircode ) {
@@ -92,11 +115,31 @@ public class UpdateContactTransactions extends Activity {
 				dir = "MISSED";
 				break;
 			}
+			if (callName == null){
+				callName = phNumber;
+			}
+			if (timesContactCalled.containsKey(phNumber)){
+				timesContactCalled.put(phNumber, timesContactCalled.get(phNumber)+1);
+				if (!arr.contains(phNumber)&&!arr.contains(callName)){
+					arr.add(phNumber);
+				}
+			} else {
+				timesContactCalled.put(phNumber,1);
+				contactNameNumber.put(phNumber, callName);
+			}
 			sb.append( "\nPhone Number:--- "+phNumber +" \nCall Type:--- "+dir+" \nCall Date:--- "+callDayTime+" \nCall duration in sec :--- "+callDuration );
 			sb.append("\n----------------------------------");
 		}
+		
+		//Collections.sort(arr);
+		
+		StringBuffer out = new StringBuffer();
+		for (String s:arr){
+			out.append(contactNameNumber.get(s) + ": " + timesContactCalled.get(s)+ "\n");
+			updateNotification(contactNameNumber.get(s));
+		}
 		managedCursor.close();
-		call.setText(sb);
+		call.setText(out);
 	}
 
 
