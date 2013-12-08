@@ -7,23 +7,29 @@ import android.app.PendingIntent;
 import android.content.Intent;
 
 public class NotifyUser extends IntentService {
+	
+	private static String names = "";
+	private static int days = 0;
 
 	public NotifyUser() {
 		super("NotifyUser");
+	}
+	
+	public static void setData(String name, int day){
+		names = name;
+		days = day;
 	}
 
 	private void notify(boolean success) {
 		// TODO: 1. Area notifications; 2. sendBroadcast or sendOrderBroadcast
 
-		int days = 0;
-		String name = "Matt";
 		Notification.Builder mBuilder = new Notification.Builder(this)
 				.setTicker("Caller Reminder!")
 				.setSmallIcon(R.drawable.ic_stat_callnotification)
-				.setContentTitle("Call " + name + "!")
+				.setContentTitle("Call " + names + "!")
 				.setContentText(
 						"It's been " + days + " days since you've called "
-								+ name);
+								+ names);
 
 		Intent resultIntent = new Intent(this, MainActivity.class);
 		// Because clicking the notification opens a new ("special") activity,
@@ -37,8 +43,10 @@ public class NotifyUser extends IntentService {
 
 		int mNotificationId = 001;
 		// Gets an instance of the NotificationManager service
+		mBuilder.setAutoCancel(true);
 		NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		// Builds the notification and issues it.
+		mBuilder.getNotification().flags |= Notification.FLAG_AUTO_CANCEL;
 		mNotifyMgr.notify(mNotificationId, mBuilder.getNotification());
 	}
 

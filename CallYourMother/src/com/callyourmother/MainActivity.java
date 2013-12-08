@@ -100,6 +100,7 @@ public class MainActivity extends Activity {
 		notiTest.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				NotifyUser.setData("Matt", 10);
 				Intent notiIntent = new Intent(MainActivity.this, NotifyUser.class);
 				startService(notiIntent);
 			}
