@@ -3,6 +3,7 @@ package com.callyourmother.data;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ContentUris;
@@ -44,6 +45,12 @@ public class Contact {
 		phone.type = CommonDataKinds.Phone.TYPE_MOBILE;
 		c.phones.add(phone);
 		return c;
+	}
+	
+	public void updateLastDateContacted(Date date){
+		for (NotificationRule rule:notificationRules){
+			rule.setStartDate(date);
+		}
 	}
 	
 	private static final String[] CONTACT_PROJECTION = new String[] {
