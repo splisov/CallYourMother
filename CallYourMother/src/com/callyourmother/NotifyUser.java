@@ -31,7 +31,7 @@ public class NotifyUser extends IntentService {
 						"It's been " + days + " days since you've called "
 								+ names);
 
-		Intent resultIntent = new Intent(this, MainActivity.class);
+		Intent resultIntent = new Intent(this, NotificationActivity.class);
 		// Because clicking the notification opens a new ("special") activity,
 		// there's
 		// no need to create an artificial back stack.

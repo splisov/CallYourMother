@@ -3,6 +3,7 @@ package com.callyourmother;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.callyourmother.data.AndroidUtility;
 import com.callyourmother.data.Circle;
 import com.callyourmother.data.Contact;
 import com.callyourmother.data.DatabaseClient;
@@ -22,7 +23,7 @@ import android.widget.TextView;
 
 public class NotificationContactAdapter extends ArrayAdapter<Contact> {
 
-	private final List<Contact> mItems = new ArrayList<Contact>();
+	private final List<Contact> mContacts = new ArrayList<Contact>();
 	private final Context mContext;
 	int layoutResourceId;
 	private DatabaseClient db;
@@ -38,22 +39,22 @@ public class NotificationContactAdapter extends ArrayAdapter<Contact> {
 
 	@Override
 	public int getCount() {
-		return mItems.size();
+		return mContacts.size();
 	}
 
 	@Override
 	public Contact getItem(int pos) {
-		return mItems.get(pos);
+		return mContacts.get(pos);
 	}
 
 	@Override
 	public long getItemId(int pos) {
-		return pos;
+		return mContacts.get(pos).getContactId();
 	}
 
 	@Override
 	public void add(Contact contact) {
-		mItems.add(contact);
+		mContacts.add(contact);
 		notifyDataSetChanged();
 	}
 
@@ -61,6 +62,7 @@ public class NotificationContactAdapter extends ArrayAdapter<Contact> {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		LinearLayout itemLayout;
 		//final Circle circle = mItems.get(position);
+
 
 		itemLayout = (LinearLayout) LayoutInflater.from(mContext).inflate(R.layout.contact_item, parent, false);
 	

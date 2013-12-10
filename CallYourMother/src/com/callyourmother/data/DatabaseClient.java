@@ -19,7 +19,7 @@ import android.database.sqlite.*;
 
 public class DatabaseClient {
 	
-	private CYMDatabase db;
+	private static CYMDatabase db;
 	private Context mContext;
 	/*
 	 * initialize database client
@@ -236,7 +236,7 @@ public class DatabaseClient {
 	/*
 	 * returns a list of notification rules for the specified contactId
 	 */
-	public List<NotificationRule> getContactNotificationRules(long contactId) {
+	public static List<NotificationRule> getContactNotificationRules(long contactId) {
 		List<NotificationRule> notificationRules = new ArrayList<NotificationRule>();
 
 		SQLiteDatabase sqldb = db.getReadableDatabase();
