@@ -16,11 +16,11 @@ public class AndroidUtility {
 	public static List<Contact> getAndroidContacts(Context context) {
 		ArrayList<Contact> contacts = new ArrayList<Contact>();
 		
-		Cursor cursor = context.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,null, null, null, null);
+		Cursor cursor = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
 		if (cursor.getCount() > 0) {
 			while (cursor.moveToNext()) {
 				try {
-					contacts.add(new Contact(cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID)), context));
+					contacts.add(new Contact(cursor.getLong(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID)), context));
 				} catch(Contact.ContactNotFoundException ex) {
 					ex.printStackTrace();
 				}
@@ -31,6 +31,25 @@ public class AndroidUtility {
 		return contacts;
 	}
 	
+	/*
+	 * Returns a list of contacts from Android for the given list of contactIds.  Any contacts that no longer exist will be deleted.
+	 */
+	public static List<Contact> getAndroidContacts(List<Long> contactIds, Context context) {
+		ArrayList<Contact> contacts = new ArrayList<Contact>();
+
+		for(Long contactId : contactIds) {
+			try {
+				contacts.add(new Contact(contactId.longValue(), context));
+			} catch (ContactNotFoundException e) {
+				DatabaseClient db = new DatabaseClient(context);
+				db.deleteContactData(contactId);
+				db = null;
+			}
+		}
+		
+		return contacts;
+	}
+
 	/*
 	 * Returns a list of contacts from Android for the given list of contactIds
 	 */

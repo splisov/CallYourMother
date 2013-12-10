@@ -1,12 +1,10 @@
 package com.callyourmother.data;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -69,7 +67,7 @@ public class Contact {
 		//get general info
 		
 		Cursor contact = context.getContentResolver().query                                     //This query now working
-				(android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI, CONTACT_PROJECTION, 
+				(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, CONTACT_PROJECTION, 
 						android.provider.ContactsContract.CommonDataKinds.Phone._ID + "=?", 
 						new String[]{String.valueOf(contactId)}, null);
         
