@@ -12,15 +12,23 @@ import com.callyourmother.data.NotificationRule;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 
 public class NotificationActivity extends Activity {
 	ListView listView3;
 	NotificationContactAdapter mAdapter; 
+	
+	static int numDaysSince = 0;
+
+	public void resetNotification(){
+		
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -29,43 +37,65 @@ public class NotificationActivity extends Activity {
 		
 		mAdapter = new NotificationContactAdapter(this, R.id.listView3);
 		
-		// Set up View
-		listView3 = (ListView)findViewById(R.id.listView3);		      
-		View header = (View)getLayoutInflater().inflate(R.layout.notification_header, null);
-		TextView header_text = (TextView) header.findViewById(R.id.notif_drawer_id);
-		
-		header_text.setText("");
-		listView3.addHeaderView(header);
-		listView3.setAdapter(mAdapter);
-		
 
 		List<Contact> contacts = AndroidUtility.getAndroidContacts(getApplicationContext());	
 		for (int i = 0; i < contacts.size(); i++){
 
+			
 			long contactID = contacts.get(i).getContactId();
 
 			
 			Contact newContact;
 			try {
-
-				newContact = new Contact(contactID, this.getApplicationContext());
-				mAdapter.add(newContact);
-				
 				List<NotificationRule> notrules = DatabaseClient.getContactNotificationRules(contactID);
 				
 
 				Date ruleTime = getLastRuleUpdate(notrules);
 				Date date = new Date();
-				if(ruleTime != null && ruleTime.before(date)){
-
-				}
 				
+				if(ruleTime != null && ruleTime.before(date) ){
+					long diffdate = date.getTime() - ruleTime.getTime();
+					diffdate = diffdate / 86400000;
+					numDaysSince = (int) diffdate;
+				}
+				newContact = new Contact(contactID, this.getApplicationContext());
+				newContact.setDaysSince(numDaysSince);
+				mAdapter.add(newContact);
 			} catch (ContactNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 		}
+		
+		View header;
+
+		listView3 = (ListView) findViewById(R.id.listView3);	
+		if(mAdapter.isEmpty()){
+			
+			
+			
+			Toast.makeText(getApplicationContext(), "Num of contacts: " + contacts.size(), Toast.LENGTH_LONG).show();
+			View header1 = LayoutInflater.from(this).inflate(R.layout.notification_footer_view,
+					null);
+			
+			listView3.addFooterView(header1);
+			
+		}else{
+
+			// Set up View	      
+			header = (View)getLayoutInflater().inflate(R.layout.notification_header, null);
+			TextView header_text = (TextView) header.findViewById(R.id.notif_drawer_id);
+			
+			header_text.setText("");
+			listView3.addHeaderView(header);
+			listView3.setAdapter(mAdapter);
+			
+		}
+		
+		
+
+		
 		
 		
 	}

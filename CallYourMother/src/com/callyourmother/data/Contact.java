@@ -22,6 +22,7 @@ public class Contact {
 	private ArrayList<Email> emails = new ArrayList<Email>();
 	private ArrayList<NotificationRule> notificationRules = new ArrayList<NotificationRule>();
 	private Bitmap photo;
+	private int daysSince = 0;
 
 	public interface ContactNotFoundHandler {
 		public void onContactNotFound(long contactId);
@@ -154,6 +155,14 @@ public class Contact {
 
 	public long getContactId() {
 		return contactId;
+	}
+	
+	public void setDaysSince(int setDays){
+		this.daysSince = setDays;
+	}
+	
+	public int getDaysSince(){
+		return daysSince;
 	}
 	
 	/*

@@ -26,6 +26,8 @@ public class NotificationContactAdapter extends ArrayAdapter<Contact> {
 	private final List<Contact> mContacts = new ArrayList<Contact>();
 	private final Context mContext;
 	int layoutResourceId;
+	String contactName;
+	int daysSince = 0;
 	private DatabaseClient db;
 
 	
@@ -64,16 +66,16 @@ public class NotificationContactAdapter extends ArrayAdapter<Contact> {
 		//final Circle circle = mItems.get(position);
 
 
-		itemLayout = (LinearLayout) LayoutInflater.from(mContext).inflate(R.layout.contact_item, parent, false);
+		itemLayout = (LinearLayout) LayoutInflater.from(mContext).inflate(R.layout.notification_item, parent, false);
 	
 
-		TextView nameView = (TextView) itemLayout.findViewById(R.id.contact_name_view);
+		TextView nameView = (TextView) itemLayout.findViewById(R.id.notif_contact_name_view);
 		nameView.setText(getItem(position).getDisplayName());
 		
-		TextView numberView = (TextView) itemLayout.findViewById(R.id.contact_number_view);
+		TextView numberView = (TextView) itemLayout.findViewById(R.id.notif_contact_number_view);
 		numberView.setText(getItem(position).getAllPhoneNumbers()); //ONLY GRAB FIRST CONTACT
 		
-		ImageView photoView = (ImageView) itemLayout.findViewById(R.id.contact_image_view);
+		ImageView photoView = (ImageView) itemLayout.findViewById(R.id.notif_contact_image_view);
 		
 		if (getItem(position).getPhoto() == null){
 			photoView.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.android));
@@ -81,6 +83,8 @@ public class NotificationContactAdapter extends ArrayAdapter<Contact> {
 			photoView.setImageBitmap(getItem(position).getPhoto());
 		}
 		
+		TextView daysView = (TextView) itemLayout.findViewById(R.id.notif_days_view);
+		daysView.setText(getItem(position).getDaysSince() + " days since you've called " + getItem(position).getDisplayName());
 		
 		return itemLayout;
 	}
