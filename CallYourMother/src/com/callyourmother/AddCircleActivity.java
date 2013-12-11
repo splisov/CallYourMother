@@ -3,6 +3,7 @@ package com.callyourmother;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +17,7 @@ import com.callyourmother.data.Circle;
 import com.callyourmother.data.Contact;
 import com.callyourmother.data.DatabaseClient;
 import com.callyourmother.data.Contact.ContactNotFoundException;
+import com.callyourmother.data.NotificationOccurrence;
 import com.callyourmother.data.NotificationRule;
 
 import android.util.Log;
@@ -98,8 +100,13 @@ public class AddCircleActivity extends Activity {
 						Spinner mySpinner = (Spinner)findViewById(R.id.reoccuranceSpinner);
 						String reoccuranceString = mySpinner.getSelectedItem().toString();
 						int reoccurance = notificationRule(reoccuranceString);
-						NotificationRule notifRule = new NotificationRule(title, 1, reoccurance, new Date(System.currentTimeMillis()));
+						Random r=new Random();
+						long randomId=(r.nextInt(99999) +1);
+						long randomId2=(r.nextInt(99999) +1);
 						
+						NotificationRule notifRule = new NotificationRule(randomId, title, 1, reoccurance, new Date(System.currentTimeMillis()));
+						NotificationOccurrence occurrence = new NotificationOccurrence(randomId2, randomId, new Date(System.currentTimeMillis()), reoccurance);
+						db.saveNotificationOccurrence(occurrence);
 						
 						if (title.length() > 0){
 							Circle newCircle = new Circle(title);
