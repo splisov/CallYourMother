@@ -17,6 +17,7 @@ public class NotificationOccurrence {
 		this.action = action;
 	}
 	public NotificationOccurrence(long notificationOccurrenceId, long notificationRuleId, Date date, int action) {
+		this.notificationOccurrenceId = notificationOccurrenceId;
 		this.notificationRuleId = notificationRuleId;
 		this.date = date;
 		this.action = action;
