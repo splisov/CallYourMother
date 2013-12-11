@@ -1,8 +1,10 @@
 package com.callyourmother.data;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Stack;
 
 public class NotificationRule {
 	
@@ -95,12 +97,25 @@ public class NotificationRule {
 	 * Returns the date for the next notification based on the history of notifications or null if no more notifications are necessary
 	 * If no history is available, the next notification will be based on the startDate
 	 */
+	public Date getNextNotification(List<NotificationOccurrence> notificationOccurrenceHistory, long contactId) {
+		ArrayList<NotificationOccurrence> contactNotificationOccurrenceHistory = new ArrayList<NotificationOccurrence>();
+		for(NotificationOccurrence no : notificationOccurrenceHistory) {
+			if(no.getContactId() == contactId) {
+				contactNotificationOccurrenceHistory.add(no);
+			}
+		}
+		return getNextNotification(contactNotificationOccurrenceHistory);
+	}
+	/*
+	 * Returns the date for the next notification based on the history of notifications or null if no more notifications are necessary
+	 * If no history is available, the next notification will be based on the startDate
+	 */
 	public Date getNextNotification(List<NotificationOccurrence> notificationOccurrenceHistory) {
 		if(interval == NotificationRule.INTERVAL_DATE) {
 			if(notificationOccurrenceHistory == null || notificationOccurrenceHistory.size() == 0) {
 				return startDate;
 			} else {
-				NotificationOccurrence lastOccurrence = (notificationOccurrenceHistory!=null&&notificationOccurrenceHistory.size()>0?notificationOccurrenceHistory.get(notificationOccurrenceHistory.size()-1):null);
+				NotificationOccurrence lastOccurrence = getMostRecentNotificationOccurrence(notificationOccurrenceHistory);
 				if(lastOccurrence.getAction() == NotificationOccurrence.ACTION_COMPLETED) {
 					return null;
 				} else {
@@ -111,7 +126,7 @@ public class NotificationRule {
 				}
 			}
 		} else {
-			NotificationOccurrence lastOccurrence = (notificationOccurrenceHistory!=null&&notificationOccurrenceHistory.size()>0?notificationOccurrenceHistory.get(notificationOccurrenceHistory.size()-1):null);
+			NotificationOccurrence lastOccurrence = getMostRecentNotificationOccurrence(notificationOccurrenceHistory); 
 			Date lastOccurrenceDate;
 			if(lastOccurrence != null) {
 				lastOccurrenceDate = lastOccurrence.getDate();
@@ -145,5 +160,17 @@ public class NotificationRule {
 			}
 			return calendar.getTime();
 		}
+	}
+	
+	public NotificationOccurrence getMostRecentNotificationOccurrence(List<NotificationOccurrence> notificationOccurrenceHistory) {
+		NotificationOccurrence mostRecent = null;
+		if(notificationOccurrenceHistory != null && notificationOccurrenceHistory.size() > 0) {
+			for(NotificationOccurrence no : notificationOccurrenceHistory) {
+				if(mostRecent == null || mostRecent.getDate().before(no.getDate())) {
+					mostRecent = no;
+				}
+			}
+		}
+		return mostRecent;
 	}
 }
