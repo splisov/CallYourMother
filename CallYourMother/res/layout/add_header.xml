@@ -4,6 +4,35 @@
     android:layout_height="match_parent"
     android:background="#D5E4EB"
     android:orientation="vertical" >
+    
+    <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="8dp">
+	 <TextView
+			android:id="@+id/circle_title_view"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Edit"
+			android:textColor="#e41515"
+			android:textStyle="bold"
+			android:paddingLeft="8dp"
+			android:paddingTop="8dp"
+			android:textSize="26dp"/>
+	 
+	 	 
+	 <TextView
+			android:id="@+id/other_view"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="a Circle:"
+			android:layout_toRightOf="@id/circle_title_view"
+			android:textColor="#d31515"
+			android:paddingLeft="8dp"	
+			android:paddingTop="8dp"
+			android:textSize="26dp"/>
+	 
+	 </RelativeLayout>
 
         <TextView
             android:id="@+id/circleLabel"
@@ -11,26 +40,30 @@
             android:layout_height="wrap_content"
             android:paddingTop="5dp"
              android:paddingLeft="5dp"
-            android:text="Circle Name" 
+            android:text="Circle Name:" 
+			android:textStyle="bold"
             android:textSize="18dp"
             android:textColor="#000000"/>
-        
-       <EditText
-	        android:id="@+id/circleText"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	         android:paddingLeft="5dp"
-	        android:textColor="#000000"
-	        android:ems="10" >
-	        <requestFocus />
-	    </EditText>
+
+        <EditText
+            android:id="@+id/circleText"
+            android:layout_width="335dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:paddingLeft="10dp"
+            android:layout_gravity="center"
+            android:textColor="#000000" >
+
+            <requestFocus />
+        </EditText>
 	    
         <TextView
             android:id="@+id/intervalLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
              android:paddingLeft="5dp"
-            android:text="Occurance" 
+            android:text="Occurance:" 
+			android:textStyle="bold"
            	android:paddingTop="5dp"
  	        android:textColor="#000000"          	
             android:textSize="18dp"/>
@@ -39,7 +72,8 @@
             android:id="@+id/reoccuranceSpinner"
             android:textColor="#000000" 
              android:paddingLeft="5dp"
-            android:layout_width="match_parent"
+            android:layout_gravity="center"
+              android:layout_width="335dp"
             android:layout_height="wrap_content" />
         
           <TextView
@@ -47,7 +81,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
              android:paddingLeft="5dp"
-            android:text="Contacts" 
+            android:text="Contacts:" 
+			android:textStyle="bold"
 	        android:textColor="#000000"            
            	android:paddingTop="5dp"
             android:textSize="18dp"/>

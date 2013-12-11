@@ -48,7 +48,7 @@ public class ViewCircle extends Activity {
 		
 		// Add contacts to view
 		TextView circleTitleView = (TextView)findViewById(R.id.circle_title_view);
-		circleTitleView.setText(title + " Circle");
+		circleTitleView.setText(title);
 		
 		TextView notificationView = (TextView)findViewById(R.id.detail_view);
 		//notificationView.setText(Notification Rule);

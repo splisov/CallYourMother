@@ -4,15 +4,32 @@
     android:layout_height="match_parent"
     android:background="#D5E4EB"
     android:orientation="vertical" >
-
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 	 <TextView
 			android:id="@+id/circle_title_view"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Dummy Circle:"
+			android:text="Dummy"
+			android:textColor="#e41515"
+			android:textStyle="bold"
 			android:paddingLeft="5dp"
-			android:textColor="#000000"
-			android:textSize="21dp"/>
+			android:textSize="26dp"/>
+	 
+	 	 
+	 <TextView
+			android:id="@+id/other_view"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Circle:"
+			android:layout_toRightOf="@id/circle_title_view"
+			android:textColor="#d31515"
+			android:paddingLeft="5dp"
+			android:textSize="26dp"/>
+	 
+	 </RelativeLayout>
+
 	 
 	   <TextView
 			android:id="@+id/detail_view"
@@ -21,8 +38,9 @@
 			android:text="Call [Once] a Week"
 			android:textColor="#555666"
 			android:paddingLeft="5dp"
+			android:textStyle="italic"
 			android:paddingBottom="7dp"
-			android:textSize="12dp"/>
+			android:textSize="16dp"/>
 	 
 	
 
