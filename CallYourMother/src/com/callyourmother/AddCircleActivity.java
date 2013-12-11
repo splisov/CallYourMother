@@ -100,12 +100,10 @@ public class AddCircleActivity extends Activity {
 						Spinner mySpinner = (Spinner)findViewById(R.id.reoccuranceSpinner);
 						String reoccuranceString = mySpinner.getSelectedItem().toString();
 						int reoccurance = notificationRule(reoccuranceString);
-						Random r=new Random();
-						long randomId=(r.nextInt(99999) +1);
-						long randomId2=(r.nextInt(99999) +1);
 						
-						NotificationRule notifRule = new NotificationRule(randomId, title, 1, reoccurance, new Date(System.currentTimeMillis()));
-						NotificationOccurrence occurrence = new NotificationOccurrence(randomId2, randomId, new Date(System.currentTimeMillis()), reoccurance);
+						NotificationRule notifRule = new NotificationRule(title, 1, reoccurance, new Date(System.currentTimeMillis()));
+						
+						NotificationOccurrence occurrence = new NotificationOccurrence(notifRule.getNotificationRuleId(), new Date(System.currentTimeMillis()), 1);
 						db.saveNotificationOccurrence(occurrence);
 						
 						if (title.length() > 0){
