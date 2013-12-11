@@ -19,6 +19,13 @@ import android.database.sqlite.*;
 
 public class DatabaseClient {
 	
+	public static final int RESULT_FAILURE = -1;
+	public static final int RESULT_NONE = 0;
+	public static final int RESULT_INSERT = 1;
+	public static final int RESULT_UPDATE = 2;
+	public static final int RESULT_DELETE = 3;
+	
+	
 	private static CYMDatabase db;
 	private Context mContext;
 	/*
@@ -63,7 +70,7 @@ public class DatabaseClient {
 		}
 	}
 	
-	public void deleteCircle(Long circleId) {
+	public int deleteCircle(Long circleId) {
 		if(circleId > 0) {
 			SQLiteDatabase sqldb = db.getWritableDatabase();
 			sqldb.beginTransaction();
@@ -80,6 +87,9 @@ public class DatabaseClient {
 				sqldb.endTransaction();
 				sqldb.close();
 			}
+			return RESULT_DELETE;
+		} else {
+			return RESULT_FAILURE;
 		}
 	}
 
@@ -147,27 +157,29 @@ public class DatabaseClient {
 	/*
 	 * Adds contact to circle
 	 */
-	public void saveCircleContact(long circleId, long contactId) {
+	public int saveCircleContact(long circleId, long contactId) {
 		SQLiteDatabase sqldb = db.getWritableDatabase();
 		sqldb.beginTransaction();
+		int result = RESULT_NONE;
 		try {
 			//check if contact already exists in circle
 			Cursor c = sqldb.rawQuery("SELECT * FROM CircleContacts WHERE contactId = ? AND circleId = ?", new String[] { String.valueOf(contactId), String.valueOf(circleId) });
 			if(!c.moveToFirst()) {
 				sqldb.execSQL("INSERT INTO CircleContacts(contactId, circleId) VALUES(?, ?)", new Object[] { contactId, circleId });
+				result = RESULT_INSERT;
 			}
 			sqldb.setTransactionSuccessful();
 		} finally {
 			sqldb.endTransaction();
 			sqldb.close();
 		}
-		
+		return result;
 	}
 
 	/*
 	 * Deletes contact from circle
 	 */
-	public void deleteCircleContact(long circleId, long contactId) {
+	public int deleteCircleContact(long circleId, long contactId) {
 		SQLiteDatabase sqldb = db.getWritableDatabase();
 		sqldb.beginTransaction();
 		try {
@@ -179,12 +191,13 @@ public class DatabaseClient {
 			sqldb.endTransaction();
 			sqldb.close();
 		}
+		return RESULT_DELETE;
 	}
 
 	/*
 	 * deletes all data from the specified contactId from the database
 	 */
-	public void deleteContactData(long contactId) {
+	public int deleteContactData(long contactId) {
 		SQLiteDatabase sqldb = db.getWritableDatabase();
 		sqldb.beginTransaction();
 		try {
@@ -198,6 +211,7 @@ public class DatabaseClient {
 			sqldb.endTransaction();
 			sqldb.close();
 		}
+		return RESULT_DELETE;
 	}
 	
 	/*
@@ -269,9 +283,10 @@ public class DatabaseClient {
 	/*
 	 * saves notification rule to database
 	 */
-	public NotificationRule saveContactNotificationRule(long contactId, NotificationRule notificationRule) {
+	public int saveContactNotificationRule(long contactId, NotificationRule notificationRule) {
 		SQLiteDatabase sqldb = db.getWritableDatabase();
 		sqldb.beginTransaction();
+		int result;
 		try {
 			if(notificationRule.getNotificationRuleId() > 0) {
 				//update
@@ -280,6 +295,7 @@ public class DatabaseClient {
 				} else {
 					sqldb.execSQL("UPDATE NotificationRules SET description = ?, interval = ?, intervalIncrement = ?, startDate = NULL WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getInterval(), notificationRule.getIntervalIncrement(), notificationRule.getNotificationRuleId() });
 				}
+				result = RESULT_UPDATE;
 			} else {
 				//insert
 				if(notificationRule.getStartDate() != null) {
@@ -293,6 +309,7 @@ public class DatabaseClient {
 				}
 				c.close();
 				sqldb.execSQL("INSERT INTO ContactNotificationRules(contactId, notificationRuleId) VALUES(?,?)", new Object[] { contactId, notificationRule.getNotificationRuleId() });
+				result = RESULT_INSERT;
 			}
 			sqldb.setTransactionSuccessful();
 		} finally {
@@ -300,15 +317,16 @@ public class DatabaseClient {
 			sqldb.close();
 		}
 		
-		return notificationRule;
+		return result;
 	}
 
 	/*
 	 * saves notification rule to database
 	 */
-	public NotificationRule saveCircleNotificationRule(long circleId, NotificationRule notificationRule) {
+	public int saveCircleNotificationRule(long circleId, NotificationRule notificationRule) {
 		SQLiteDatabase sqldb = db.getWritableDatabase();
 		sqldb.beginTransaction();
+		int result;
 		try {
 			if(notificationRule.getNotificationRuleId() > 0) {
 				//update
@@ -317,6 +335,7 @@ public class DatabaseClient {
 				} else {
 					sqldb.execSQL("UPDATE NotificationRules SET description = ?, interval = ?, startDate = NULL WHERE notificationRuleId = ?", new Object[] { notificationRule.getDescription(), notificationRule.getInterval(), notificationRule.getNotificationRuleId() });
 				}
+				result = RESULT_UPDATE;
 			} else {
 				//insert
 				if(notificationRule.getStartDate() != null) {
@@ -331,6 +350,7 @@ public class DatabaseClient {
 				}
 				c.close();
 				sqldb.execSQL("INSERT INTO CircleNotificationRules(circleId, notificationRuleId) VALUES(?,?)", new Object[] { circleId, notificationRule.getNotificationRuleId() });
+				result = RESULT_INSERT;
 			}
 			sqldb.setTransactionSuccessful();
 		} finally {
@@ -338,13 +358,13 @@ public class DatabaseClient {
 			sqldb.close();
 		}
 		
-		return notificationRule;
+		return result;
 	}
 	
 	/*
 	 * deletes notification rule from database
 	 */
-	public void deleteNotificationRule(long notificationRuleId) {
+	public int deleteNotificationRule(long notificationRuleId) {
 		SQLiteDatabase sqldb = db.getWritableDatabase();
 		sqldb.beginTransaction();
 		try {
@@ -358,6 +378,7 @@ public class DatabaseClient {
 			sqldb.endTransaction();
 			sqldb.close();
 		}
+		return RESULT_DELETE;
 	}	
 
 	/*
@@ -407,13 +428,15 @@ public class DatabaseClient {
 	/*
 	 * saves notification occurrence to database
 	 */
-	public NotificationOccurrence saveNotificationOccurrence(NotificationOccurrence notificationOccurrence) {
+	public int saveNotificationOccurrence(NotificationOccurrence notificationOccurrence) {
 		SQLiteDatabase sqldb = db.getWritableDatabase();
 		sqldb.beginTransaction();
+		int result;
 		try {
 			if(notificationOccurrence.getNotificationOccurrenceId() > 0) {
 				//update
 				sqldb.execSQL("UPDATE NotificationOccurrences SET notificationRuleId = ?, contactId = ?, date = ?, action = ? WHERE notificationOccurrenceId = ?", new Object[] { notificationOccurrence.getNotificationRuleId(), notificationOccurrence.getContactId(), notificationOccurrence.getDate().getTime(), notificationOccurrence.getAction(), notificationOccurrence.getNotificationOccurrenceId() });
+				result = RESULT_UPDATE;
 			} else {
 				//insert
 				sqldb.execSQL("INSERT INTO NotificationOccurrences(notificationRuleId, contactId, date, action) VALUES(?,?,?,?)", new Object[] { notificationOccurrence.getNotificationRuleId(), notificationOccurrence.getContactId(), notificationOccurrence.getDate().getTime(), notificationOccurrence.getAction() });
@@ -422,6 +445,7 @@ public class DatabaseClient {
 					notificationOccurrence.setNotificationOccurrenceId(c.getLong(0));
 				}
 				c.close();
+				result = RESULT_INSERT;
 			}
 			sqldb.setTransactionSuccessful();
 		} finally {
@@ -429,7 +453,7 @@ public class DatabaseClient {
 			sqldb.close();
 		}
 		
-		return notificationOccurrence;
+		return result;
 	}
 
 	/*
