@@ -5,6 +5,7 @@ import java.util.List;
 import com.callyourmother.data.Contact;
 import com.callyourmother.data.DatabaseClient;
 import com.callyourmother.data.Contact.ContactNotFoundException;
+import com.callyourmother.data.NotificationRule;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -51,7 +52,13 @@ public class ViewCircle extends Activity {
 		circleTitleView.setText(title);
 		
 		TextView notificationView = (TextView)findViewById(R.id.detail_view);
-		//notificationView.setText(Notification Rule);
+		List<NotificationRule> nRule = db.getCircleNotificationRules(cId);
+		if(nRule!= null){
+			NotificationRule rep = nRule.get(0);
+			int notifInterval = rep.getIntervalIncrement();
+			notificationView.setText(notificationRule(notifInterval));
+		}
+		
 		
 		
 		List<Contact> contacts = db.getCircleContacts(cId, getApplicationContext());
@@ -122,7 +129,12 @@ public class ViewCircle extends Activity {
 			circleTitleView.setText(t);
 			
 			TextView notificationView = (TextView)findViewById(R.id.detail_view);
-			//notificationView.setText(Notification Rule);
+			List<NotificationRule> nRule = db.getCircleNotificationRules(cId);
+			if(nRule!= null){
+				NotificationRule rep = nRule.get(0);
+				int notifInterval = rep.getIntervalIncrement();
+				notificationView.setText(notificationRule(notifInterval));
+			}
 			
 			if (contacts != null){
 				for (int i = 0; i < contacts.size(); i++){	//NOT WORKING
@@ -133,6 +145,22 @@ public class ViewCircle extends Activity {
 
 		
 		
+	}
+	
+private String notificationRule(int s){
+		
+		if (s == 1){
+			return "Call Once";
+		} else if (s ==3){
+			return "Call Once a Day";
+		} else if (s ==4){
+			return "Call Once a Week";
+		} else if (s ==5){
+			return "Call Once a Month";
+		} else if (s ==6){
+			return "Call Once a Year";
+		}	
+		return "Call Once a Day";
 	}
 	
 }

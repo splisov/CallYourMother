@@ -41,6 +41,8 @@ public class EditCircleActivity extends Activity {
 	static ArrayList<Long> contactIdList;
 	long global_cid;
 	static List<Contact> contactList;
+	static int interval;
+	static NotificationRule globalRule;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +87,16 @@ public class EditCircleActivity extends Activity {
 		        R.array.occurance_array, android.R.layout.simple_spinner_item);
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(spinnerAdapter);
-		spinner.setSelection(1); //HARDCODED; FIX LATER
+		
+		List<NotificationRule> nRule = db.getCircleNotificationRules(cId);
+		interval = 0;
+		if(nRule!= null){
+			globalRule = nRule.get(0);
+			interval = notifMap(globalRule.getIntervalIncrement());
+			Log.i("DEBUG", "the interval is" + notifMap(interval));
+			
+		}
+		spinner.setSelection(interval); //HARDCODED; FIX LATER
 		
 		
 		
@@ -121,8 +132,15 @@ public class EditCircleActivity extends Activity {
 							Spinner mySpinner = (Spinner)findViewById(R.id.reoccuranceSpinner);
 							String reoccuranceString = mySpinner.getSelectedItem().toString();
 							int reoccurance = notificationRule(reoccuranceString);
-							NotificationRule notifRule = new NotificationRule(title, 1, reoccurance, new Date(System.currentTimeMillis()));
-							
+							NotificationRule notifRule;
+							if (reoccurance != interval){
+								Log.i("DEBUG", "THEY ARE NOT THE SAME");
+								notifRule = new NotificationRule(title, 1, reoccurance, new Date(System.currentTimeMillis()));
+								db.deleteNotificationRule(globalRule.getNotificationRuleId());
+							} else {
+								Log.i("DEBUG", "samsies");
+								notifRule = globalRule;
+							}
 							long newCId = cId;
 							if (title.length() > 0){
 								if (!title.equals(newTitle)){
@@ -215,6 +233,23 @@ public class EditCircleActivity extends Activity {
 				}
 				return 0;		
 			}
+			
+
+private int notifMap(int s){
+	if (s == 1){
+		return 0;
+	} else if (s ==3){
+		return 1;
+	} else if (s ==4){
+		return 2;
+	} else if (s ==5){
+		return 3;
+	} else if (s ==6){
+		return 4;
+	}	
+	return 1;
+
+}
 
 
 		}
