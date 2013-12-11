@@ -126,8 +126,7 @@ public class EditCircleActivity extends Activity {
 							long newCId = cId;
 							if (title.length() > 0){
 								if (!title.equals(newTitle)){
-									db.deleteCircle(cId);
-									Circle newCircle = new Circle(newTitle);
+									Circle newCircle = new Circle(cId, newTitle);
 									db.saveCircle(newCircle);
 									newCId = newCircle.getCircleId();
 									global_cid = newCId;
