@@ -15,10 +15,14 @@ import com.callyourmother.data.DatabaseClient;
 import com.callyourmother.data.NotificationOccurrence;
 import com.callyourmother.data.NotificationRule;
 
+
 import android.app.Activity;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.CallLog;
+import android.util.Log;
 import android.widget.TextView;
 
 public class UpdateContactTransactions extends Activity {
@@ -28,7 +32,17 @@ public class UpdateContactTransactions extends Activity {
 	private HashMap<String, Long> contactNameDate;
 	private HashMap<String, String> contactNameNumber;
 	private int minCallLength = 15;
+	private final Handler mHandler= new Handler();
 	
+	private Runnable mHandlerTask = new Runnable() {
+		
+		@Override
+		public void run() {
+			new GetCallDetailsTask().execute();
+			
+		}
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -58,6 +72,8 @@ public class UpdateContactTransactions extends Activity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		//mHandler.postDelayed(mHandlerTask, 1);
+		new GetCallDetailsTask().execute();
 	}
 
 	@Override
@@ -88,7 +104,7 @@ public class UpdateContactTransactions extends Activity {
 			return;
 		}
 		long contactID = contact.getContactId();
-		
+
 		if (contactID != 0){
 			DatabaseClient client = new DatabaseClient(getApplicationContext());
 			List<NotificationRule> rules = client.getContactNotificationRules(contactID);
@@ -107,7 +123,7 @@ public class UpdateContactTransactions extends Activity {
 			}
 		}
 	}
-	
+
 	private Date getLastRuleUpdate(List<NotificationRule> rules){
 		long shortestTime = Long.MAX_VALUE;
 		Date smallestDate = null;
@@ -119,7 +135,7 @@ public class UpdateContactTransactions extends Activity {
 		}
 		return smallestDate;
 	}
-	
+
 	private Contact findContact(List<Contact> contacts, String displayName){
 		long contactID = 0;
 		for (Contact c: contacts){
@@ -131,79 +147,161 @@ public class UpdateContactTransactions extends Activity {
 		}
 		return null;
 	}
-	
-	@SuppressWarnings("deprecation")
+
+
 	private void getCallDetails() {
-
-		StringBuffer sb = new StringBuffer();
-		Cursor managedCursor = managedQuery( CallLog.Calls.CONTENT_URI,null, null,null, CallLog.Calls.DATE+" DESC");
-		int number = managedCursor.getColumnIndex( CallLog.Calls.NUMBER ); 
-		int type = managedCursor.getColumnIndex( CallLog.Calls.TYPE );
-		int date = managedCursor.getColumnIndex( CallLog.Calls.DATE);
-		int duration = managedCursor.getColumnIndex( CallLog.Calls.DURATION);
-		int name = managedCursor.getColumnIndex( CallLog.Calls.CACHED_NAME);
-		
-		sb.append( "Call Details :");
-		ArrayList<String> arr = new ArrayList<String>(); 
-		while ( managedCursor.moveToNext() ) {
-			String phNumber = managedCursor.getString( number );
-			String callType = managedCursor.getString( type );
-			String callDate = managedCursor.getString( date );
-			Date callDayTime = new Date(Long.valueOf(callDate));
-			
-			String callDuration = managedCursor.getString( duration );
-			String callName = managedCursor.getString( name );
-			
-			
-			
-			if (Integer.valueOf(callDuration)<minCallLength){
-				continue;
-			}
-			
-			
-			String dir = null;
-			int dircode = Integer.parseInt( callType );
-			switch( dircode ) {
-			case CallLog.Calls.OUTGOING_TYPE:
-				dir = "OUTGOING";
-				break;
-
-			case CallLog.Calls.INCOMING_TYPE:
-				dir = "INCOMING";
-				break;
-
-			case CallLog.Calls.MISSED_TYPE:
-				dir = "MISSED";
-				break;
-			}
-			if (callName == null){
-				callName = phNumber;
-			}
-			if (timesContactCalled.containsKey(phNumber)){
-				timesContactCalled.put(phNumber, timesContactCalled.get(phNumber)+1);
-				if (!arr.contains(phNumber)&&!arr.contains(callName)){
-					arr.add(phNumber);
-				}
-			} else {
-				timesContactCalled.put(phNumber,1);
-				contactNameNumber.put(phNumber, callName);
-				contactNameDate.put(phNumber, (Long) callDayTime.getTime());
-			}
-			// sb.append( "\nPhone Number:--- "+phNumber +" \nCall Type:--- "+dir+" \nCall Date:--- "+callDayTime+" \nCall duration in sec :--- "+callDuration );
-			// sb.append("\n----------------------------------");
-		}
-		
-		//Collections.sort(arr);
-		StringBuffer out = new StringBuffer();
-		List<Contact> contacts = AndroidUtility.getAndroidContacts(getApplicationContext());		
-		for (String s:arr){
-			out.append(contactNameNumber.get(s) + ": " + timesContactCalled.get(s)+ "\n");
-			updateNotification(contactNameNumber.get(s),contacts);
-			
-		}
-		managedCursor.close();
-		call.setText(out);
+		/*
+//		StringBuffer sb = new StringBuffer();
+//		Cursor managedCursor = managedQuery( CallLog.Calls.CONTENT_URI,null, null,null, CallLog.Calls.DATE+" DESC");
+//		int number = managedCursor.getColumnIndex( CallLog.Calls.NUMBER ); 
+//		int type = managedCursor.getColumnIndex( CallLog.Calls.TYPE );
+//		int date = managedCursor.getColumnIndex( CallLog.Calls.DATE);
+//		int duration = managedCursor.getColumnIndex( CallLog.Calls.DURATION);
+//		int name = managedCursor.getColumnIndex( CallLog.Calls.CACHED_NAME);
+//		
+//		sb.append( "Call Details :");
+//		ArrayList<String> arr = new ArrayList<String>(); 
+//		while ( managedCursor.moveToNext() ) {
+//			String phNumber = managedCursor.getString( number );
+//			String callType = managedCursor.getString( type );
+//			String callDate = managedCursor.getString( date );
+//			Date callDayTime = new Date(Long.valueOf(callDate));
+//			
+//			String callDuration = managedCursor.getString( duration );
+//			String callName = managedCursor.getString( name );
+//			
+//			
+//			
+//			if (Integer.valueOf(callDuration)<minCallLength){
+//				continue;
+//			}
+//			
+//			
+//			String dir = null;
+//			int dircode = Integer.parseInt( callType );
+//			switch( dircode ) {
+//			case CallLog.Calls.OUTGOING_TYPE:
+//				dir = "OUTGOING";
+//				break;
+//
+//			case CallLog.Calls.INCOMING_TYPE:
+//				dir = "INCOMING";
+//				break;
+//
+//			case CallLog.Calls.MISSED_TYPE:
+//				dir = "MISSED";
+//				break;
+//			}
+//			if (callName == null){
+//				callName = phNumber;
+//			}
+//			if (timesContactCalled.containsKey(phNumber)){
+//				timesContactCalled.put(phNumber, timesContactCalled.get(phNumber)+1);
+//				if (!arr.contains(phNumber)&&!arr.contains(callName)){
+//					arr.add(phNumber);
+//				}
+//			} else {
+//				timesContactCalled.put(phNumber,1);
+//				contactNameNumber.put(phNumber, callName);
+//				contactNameDate.put(phNumber, (Long) callDayTime.getTime());
+//			}
+//			// sb.append( "\nPhone Number:--- "+phNumber +" \nCall Type:--- "+dir+" \nCall Date:--- "+callDayTime+" \nCall duration in sec :--- "+callDuration );
+//			// sb.append("\n----------------------------------");
+//		}
+//		
+//		//Collections.sort(arr);
+//		StringBuffer out = new StringBuffer();
+//		List<Contact> contacts = AndroidUtility.getAndroidContacts(getApplicationContext());		
+//		for (String s:arr){
+//			out.append(contactNameNumber.get(s) + ": " + timesContactCalled.get(s)+ "\n");
+//			updateNotification(contactNameNumber.get(s),contacts);
+//			
+//		}
+//		managedCursor.close();
+//		call.setText(out);
+		 */		
 	}
 
+
+	private class GetCallDetailsTask extends AsyncTask<Void, Void, StringBuffer> {
+
+		@Override
+		protected StringBuffer doInBackground(Void... params) {
+			Log.v("GetCallDetailsTask","started");
+			@SuppressWarnings("deprecation")
+			Cursor managedCursor = managedQuery( CallLog.Calls.CONTENT_URI,null, null,null, CallLog.Calls.DATE+" DESC");
+			int number = managedCursor.getColumnIndex( CallLog.Calls.NUMBER ); 
+			int type = managedCursor.getColumnIndex( CallLog.Calls.TYPE );
+			int date = managedCursor.getColumnIndex( CallLog.Calls.DATE);
+			int duration = managedCursor.getColumnIndex( CallLog.Calls.DURATION);
+			int name = managedCursor.getColumnIndex( CallLog.Calls.CACHED_NAME);
+
+			ArrayList<String> arr = new ArrayList<String>(); 
+			while ( managedCursor.moveToNext() ) {
+				String phNumber = managedCursor.getString( number );
+				String callType = managedCursor.getString( type );
+				String callDate = managedCursor.getString( date );
+				Date callDayTime = new Date(Long.valueOf(callDate));
+
+				String callDuration = managedCursor.getString( duration );
+				String callName = managedCursor.getString( name );
+
+
+
+				if (Integer.valueOf(callDuration)<minCallLength){
+					continue;
+				}
+
+
+				String dir = null;
+				int dircode = Integer.parseInt( callType );
+				switch( dircode ) {
+				case CallLog.Calls.OUTGOING_TYPE:
+					dir = "OUTGOING";
+					break;
+
+				case CallLog.Calls.INCOMING_TYPE:
+					dir = "INCOMING";
+					break;
+
+				case CallLog.Calls.MISSED_TYPE:
+					dir = "MISSED";
+					break;
+				}
+				if (callName == null){
+					callName = phNumber;
+				}
+				if (timesContactCalled.containsKey(phNumber)){
+					timesContactCalled.put(phNumber, timesContactCalled.get(phNumber)+1);
+					if (!arr.contains(phNumber)&&!arr.contains(callName)){
+						arr.add(phNumber);
+					}
+				} else {
+					timesContactCalled.put(phNumber,1);
+					contactNameNumber.put(phNumber, callName);
+					contactNameDate.put(phNumber, (Long) callDayTime.getTime());
+				}
+			}
+
+			StringBuffer out = new StringBuffer();
+			List<Contact> contacts = AndroidUtility.getAndroidContacts(getApplicationContext());		
+			for (String s:arr){
+				out.append(contactNameNumber.get(s) + ": " + timesContactCalled.get(s)+ "\n");
+				updateNotification(contactNameNumber.get(s),contacts);
+
+			}
+			managedCursor.close();
+			Log.v("GetCallDetailsTask",out.toString());
+			return out;
+		}
+
+		protected void onProgressUpdate(Integer... progress) {
+
+		}
+
+		protected void onPostExecute(StringBuffer result) {
+
+		}
+	}
 
 }
