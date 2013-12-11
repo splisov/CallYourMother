@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -39,6 +40,7 @@ import com.callyourmother.data.NotificationRule;
 
 public class MainActivity extends Activity {
 
+	private static final String TAG = "MainActivity";
 	private static final int NOTIFICATION_DRAWER = 0;
 	private static final int CREATE_NEW_CIRCLE = 1;
 	private static final int EDIT_CIRCLE = 2;
@@ -54,7 +56,23 @@ public class MainActivity extends Activity {
 	private HashMap<String, String> contactNameNumber;
 	private int minCallLength = 15;
 	private StringBuffer callDetails;
+	BroadcastReceiver mCallReceiver = new BroadcastReceiver(){
 
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.i(TAG, "BroadcastReceiver mCallReceiver onReceive");
+			if (intent.getAction().equals(Intent.ACTION_ANSWER)){
+				// Receiving a phone call
+				new GetCallDetailsTask(getApplicationContext()).execute();
+			} else if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)){
+				// Place a phone call
+				new GetCallDetailsTask(getApplicationContext()).execute();
+			}
+		}
+		
+	};
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -148,9 +166,6 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
-
-
-
 
 
 	@Override
