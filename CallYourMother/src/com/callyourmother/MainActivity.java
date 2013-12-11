@@ -274,6 +274,50 @@ public class MainActivity extends Activity {
 		PendingIntent pIntent = PendingIntent.getService(this,  1, startCheckContactDataIntent, PendingIntent.FLAG_ONE_SHOT);
 		mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, AlarmManager.INTERVAL_DAY, delay, pIntent);
 
+		
+		DatabaseClient dbc = new DatabaseClient(getApplicationContext());
+		Log.v("Callyourmother",
+				"Superman reached into service!");
+
+		List<Circle> allCircles = dbc.getCircles();
+
+		List<Contact> contacts;
+
+		for (Circle circle : allCircles) {
+			contacts = dbc.getCircleContacts(circle.getCircleId(),
+					getApplicationContext());
+
+			for (int i = 0; i < contacts.size(); i++) {
+				List<NotificationRule> contactRules = dbc
+						.getContactNotificationRules(contacts.get(i)
+								.getContactId());
+
+				for (NotificationRule rule : contactRules) {
+					Date ruleTime = rule.getNextNotification(dbc
+							.getNotificationOccurrences(rule
+									.getNotificationRuleId()));
+
+					Date date = new Date(System.currentTimeMillis() - 1200000);
+
+					Log.v("Callyourmother", "Ruletime: " + ruleTime.toString());
+
+					Log.v("Callyourmother",
+							"Ruletime, beforedate : " + date.toString());
+
+					if (ruleTime != null && ruleTime.before(date)) {
+
+						long diffdate = date.getTime() - ruleTime.getTime();
+						diffdate = diffdate / 86400000;
+						
+						NotifyUser.setData(contacts.get(i).getDisplayName(), (int) diffdate);
+						Intent notiIntent = new Intent(this, NotifyUser.class);
+
+						startService(notiIntent);
+					}
+				}
+
+			}
+		}
 		//Using loader to get call info
 		//getLoaderManager().initLoader(0, null, this);
 	}
