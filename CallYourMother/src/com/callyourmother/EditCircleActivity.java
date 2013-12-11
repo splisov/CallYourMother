@@ -14,6 +14,7 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import com.callyourmother.data.Circle;
 import com.callyourmother.data.Contact;
 import com.callyourmother.data.DatabaseClient;
+import com.callyourmother.data.NotificationOccurrence;
 import com.callyourmother.data.NotificationRule;
 import com.callyourmother.data.Contact.ContactNotFoundException;
 import com.callyourmother.data.NotificationRule;
@@ -131,10 +132,13 @@ public class EditCircleActivity extends Activity {
 									newCId = newCircle.getCircleId();
 									global_cid = newCId;
 								} 
-								for (int j =0; j < contactIdList.size(); j++){
-									db.saveCircleContact(newCId, contactIdList.get(j));
-								}
 								db.saveCircleNotificationRule(newCId, notifRule);
+								for (int j =0; j < contactIdList.size(); j++){
+									if(db.saveCircleContact(newCId, contactIdList.get(j)) == DatabaseClient.RESULT_INSERT) {
+										//if this is a new contact for this circle then add an occurrence
+										db.saveNotificationOccurrence(new NotificationOccurrence(notifRule.getNotificationRuleId(), newCId, new Date(System.currentTimeMillis()), 1));
+									}
+								}
 								//update existing circle
 								//if different name, delete old circle and add new
 								//set reoccurance for each contact

@@ -33,11 +33,11 @@ public class DatabaseTestFunctions {
 		Circle circle = new Circle("Test");
 		circle = db.saveCircle(circle);
 		NotificationRule circleNotificationRule = new NotificationRule("Circle NotificationRule 1", NotificationRule.INTERVAL_MONTHS, 1, new Date());
-		circleNotificationRule = db.saveCircleNotificationRule(circle.getCircleId(), circleNotificationRule);
+		db.saveCircleNotificationRule(circle.getCircleId(), circleNotificationRule);
 		circleNotificationRule.setDescription("Circle NotificationRule 1a");
-		circleNotificationRule = db.saveCircleNotificationRule(circle.getCircleId(), circleNotificationRule);
+		db.saveCircleNotificationRule(circle.getCircleId(), circleNotificationRule);
 		NotificationOccurrence circleNotificationOccurrence = new NotificationOccurrence(circleNotificationRule.getNotificationRuleId(), 1, new Date(), NotificationOccurrence.ACTION_COMPLETED);
-		circleNotificationOccurrence = db.saveNotificationOccurrence(circleNotificationOccurrence);
+		db.saveNotificationOccurrence(circleNotificationOccurrence);
 		db.getNotificationOccurrences(circleNotificationOccurrence.getNotificationOccurrenceId());
 		db.deleteNotificationRule(circleNotificationRule.getNotificationRuleId());
 		db.deleteCircle(circle);
@@ -62,11 +62,11 @@ public class DatabaseTestFunctions {
 			contact = Contact.createDummyContact();
 		}
 		NotificationRule contactNotificationRule = new NotificationRule("Contact NotificationRule 1", NotificationRule.INTERVAL_DATE, 0, new Date());
-		contactNotificationRule = db.saveContactNotificationRule(contact.getContactId(), contactNotificationRule);
+		db.saveContactNotificationRule(contact.getContactId(), contactNotificationRule);
 		contactNotificationRule.setDescription("Contact NotificationRule 1a");
-		contactNotificationRule = db.saveCircleNotificationRule(contact.getContactId(), contactNotificationRule);
+		db.saveCircleNotificationRule(contact.getContactId(), contactNotificationRule);
 		NotificationOccurrence contactNotificationOccurrence = new NotificationOccurrence(contactNotificationRule.getNotificationRuleId(), 1, new Date(), NotificationOccurrence.ACTION_IGNORED);
-		contactNotificationOccurrence = db.saveNotificationOccurrence(contactNotificationOccurrence);
+		db.saveNotificationOccurrence(contactNotificationOccurrence);
 		db.getNotificationOccurrences(contactNotificationOccurrence.getNotificationOccurrenceId());
 		db.deleteNotificationRule(contactNotificationRule.getNotificationRuleId());
 	}
