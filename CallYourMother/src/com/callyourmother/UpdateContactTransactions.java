@@ -17,6 +17,7 @@ import com.callyourmother.data.NotificationRule;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -66,7 +67,7 @@ public class UpdateContactTransactions extends Activity {
 		// TODO Auto-generated method stub
 		super.onResume();
 		//mHandler.postDelayed(mHandlerTask, 1);
-		new GetCallDetailsTask().execute();
+		new GetCallDetailsTask(this.getApplicationContext()).execute();
 	}
 
 	@Override
@@ -218,12 +219,16 @@ public class UpdateContactTransactions extends Activity {
 
 
 	private class GetCallDetailsTask extends AsyncTask<Void, Void, StringBuffer> {
+		
+		private Context mContext = null;
+		public GetCallDetailsTask(Context applicationContext) {
+			mContext = applicationContext;
+		}
 
 		@Override
 		protected StringBuffer doInBackground(Void... params) {
 			Log.v("GetCallDetailsTask","started");
-			@SuppressWarnings("deprecation")
-			Cursor managedCursor = managedQuery( CallLog.Calls.CONTENT_URI,null, null,null, CallLog.Calls.DATE+" DESC");
+			Cursor managedCursor = mContext.getContentResolver().query( CallLog.Calls.CONTENT_URI,null, null,null, CallLog.Calls.DATE+" DESC");
 			int number = managedCursor.getColumnIndex( CallLog.Calls.NUMBER ); 
 			int type = managedCursor.getColumnIndex( CallLog.Calls.TYPE );
 			int date = managedCursor.getColumnIndex( CallLog.Calls.DATE);

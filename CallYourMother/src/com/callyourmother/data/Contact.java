@@ -80,6 +80,7 @@ public class Contact {
 				photoUri = Uri.parse(contact.getString(contact.getColumnIndex(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI)));
 			}
 			contact.close();
+			contact = null;
 			
 			//get phones
 			Cursor phones = context.getContentResolver().query( Uri.withAppendedPath(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, String.valueOf(contactId)), null, null, null, null);
@@ -107,7 +108,9 @@ public class Contact {
 				photoCursor.close();
 		    }
 		} else {
-			contact.close();
+			if(contact != null) {
+				contact.close();
+			}
 			throw new ContactNotFoundException(contactId);
 		}
 	}

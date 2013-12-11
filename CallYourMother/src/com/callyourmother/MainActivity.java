@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -103,7 +104,7 @@ public class MainActivity extends Activity {
 				Log.i("DEBUG", "Item selected at position " + position);
 
 				List<Circle> circles = db.getCircles();
-				if (position < circles.size() && position > 0) {
+				if (position <= circles.size() && position > 0) {
 					Circle curr = circles.get(position - 1);
 					Intent listItemIntent = new Intent(MainActivity.this, ViewCircle.class);
 					listItemIntent.putExtra("circle_id", curr.getCircleId());
@@ -240,7 +241,7 @@ public class MainActivity extends Activity {
 	protected void onResume(){
 		super.onResume();
 		Log.i("DEBUG", "In on resume");
-		new GetCallDetailsTask().execute();
+		new GetCallDetailsTask(this.getApplicationContext()).execute();
 
 	}
 
@@ -267,12 +268,15 @@ public class MainActivity extends Activity {
 
 	private class GetCallDetailsTask extends AsyncTask<Void, Void, StringBuffer> {
 
-		
+		private Context mContext;
+		public GetCallDetailsTask(Context applicationContext) {
+			mContext = applicationContext;
+		}
+
 		@Override
 		protected StringBuffer doInBackground(Void... params) {
 			Log.v("GetCallDetailsTask","started");
-			@SuppressWarnings("deprecation")
-			Cursor managedCursor = managedQuery( CallLog.Calls.CONTENT_URI,null, null,null, CallLog.Calls.DATE+" DESC");
+			Cursor managedCursor = mContext.getContentResolver().query( CallLog.Calls.CONTENT_URI,null, null,null, CallLog.Calls.DATE+" DESC");
 			int number = managedCursor.getColumnIndex( CallLog.Calls.NUMBER ); 
 			int type = managedCursor.getColumnIndex( CallLog.Calls.TYPE );
 			int date = managedCursor.getColumnIndex( CallLog.Calls.DATE);
