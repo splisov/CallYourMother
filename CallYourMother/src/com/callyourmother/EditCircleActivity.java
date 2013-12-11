@@ -1,8 +1,11 @@
 package com.callyourmother;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,7 +14,9 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import com.callyourmother.data.Circle;
 import com.callyourmother.data.Contact;
 import com.callyourmother.data.DatabaseClient;
+import com.callyourmother.data.NotificationRule;
 import com.callyourmother.data.Contact.ContactNotFoundException;
+import com.callyourmother.data.NotificationRule;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,13 +30,16 @@ import android.widget.Toast;
 
 
 public class EditCircleActivity extends Activity {
+	
 	private static final int CONTACT_PICKER_RESULT = 1001;
 	private static final String CONTACT_BASE_URI = "content://com.android.contacts/data/";
 	
-	ListView listView2;
-	ContactAdapter mAdapter; 
-	DatabaseClient db;
-	ArrayList<Long> contactIdList;
+	static ListView listView2;
+	static EditAdapter mAdapter; 
+	static DatabaseClient db;
+	static ArrayList<Long> contactIdList;
+	long global_cid;
+	static List<Contact> contactList;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +48,15 @@ public class EditCircleActivity extends Activity {
 		
 		
 		db = new DatabaseClient(this.getApplicationContext());
-		mAdapter = new ContactAdapter(this, R.id.listView2);
+		mAdapter = new EditAdapter(this, R.layout.contact_item);
 		contactIdList = new ArrayList<Long>();
+		contactList = new ArrayList<Contact>();
+		
+		Bundle b = getIntent().getExtras();
+		final long cId = b.getLong("circle_id");
+		global_cid = cId;
+		final String title = b.getString("circle_description");
+		List <Contact> contacts = db.getCircleContacts(cId, getApplicationContext());
 		
 		// Set up View
 		listView2 = (ListView)findViewById(R.id.listView2);		      
@@ -52,8 +67,16 @@ public class EditCircleActivity extends Activity {
 		listView2.setAdapter(mAdapter);
 		
 		//Set title
-		EditText title = (EditText)findViewById(R.id.circleText);
-		title.setText("DUMMY CIRCLE"); // HARDCODED; FIX LATER
+		EditText titleView = (EditText)findViewById(R.id.circleText);
+		titleView.setText(title); 
+		
+		//Add exisiting group contacts
+		for (int i = 0; i<contacts.size(); i++){
+			contactIdList.add(contacts.get(i).getContactId());
+			mAdapter.add(contacts.get(i));
+			contactList.add(contacts.get(i));
+			
+		}
 		
 		// Set up an Occurance Spinner
 		Spinner spinner = (Spinner) findViewById(R.id.reoccuranceSpinner);
@@ -62,6 +85,7 @@ public class EditCircleActivity extends Activity {
 		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(spinnerAdapter);
 		spinner.setSelection(1); //HARDCODED; FIX LATER
+		
 		
 		
 		// Add a Contact to the List
@@ -92,23 +116,41 @@ public class EditCircleActivity extends Activity {
 						@Override
 						public void onClick(View v) {
 							EditText circleTitleText = (EditText)findViewById(R.id.circleText);
-							String title = circleTitleText.getText().toString().trim();
+							String newTitle = circleTitleText.getText().toString().trim();
 							Spinner mySpinner = (Spinner)findViewById(R.id.reoccuranceSpinner);
-							String reoccurance = mySpinner.getSelectedItem().toString();
+							String reoccuranceString = mySpinner.getSelectedItem().toString();
+							int reoccurance = notificationRule(reoccuranceString);
+							NotificationRule notifRule = new NotificationRule(title, 1, reoccurance, new Date(System.currentTimeMillis()));
 							
+							long newCId = cId;
 							if (title.length() > 0){
-							
+								if (!title.equals(newTitle)){
+									db.deleteCircle(cId);
+									Circle newCircle = new Circle(newTitle);
+									db.saveCircle(newCircle);
+									newCId = newCircle.getCircleId();
+									global_cid = newCId;
+								} 
+								for (int j =0; j < contactIdList.size(); j++){
+									db.saveCircleContact(newCId, contactIdList.get(j));
+								}
+								db.saveCircleNotificationRule(newCId, notifRule);
 								//update existing circle
 								//if different name, delete old circle and add new
 								//set reoccurance for each contact
-								setResult(RESULT_OK);
+								Intent i = new Intent();
+								i.putExtra("circle_id", newCId);
+								i.putExtra("circle_description", newTitle);
+								setResult(RESULT_OK, i);
 							finish();
 							} else {
-									Toast.makeText(getApplication(), "Please enter a circle name.", Toast.LENGTH_LONG).show();
+								Toast.makeText(getApplication(), "Please enter a circle name.", Toast.LENGTH_LONG).show();
 							}
 						}
 					});
 		}
+	
+	
 			
 			@Override
 			protected void onActivityResult(int requestCode, int resultCode, Intent data) {  
@@ -124,6 +166,7 @@ public class EditCircleActivity extends Activity {
 						Contact newContact = new Contact(contactId, this.getApplicationContext());
 						mAdapter.add(newContact);
 						contactIdList.add(contactId);
+						contactList.add(newContact);
 					} catch (NumberFormatException e) {
 						Log.i("DEBUG", "AddCircleActivity NumberFormatException " + e);
 					} catch (ContactNotFoundException e) {
@@ -136,5 +179,39 @@ public class EditCircleActivity extends Activity {
 			    }  
 			}  
 			
+			public static void deleteTempContact(Context c, Contact contact){
+				Log.i("DEBUG", "In AddCircleActivity for deletion of contact " + contact.getContactId());
+				db.deleteContactData(contact.getContactId());
+				mAdapter.remove(contact);
+				contactIdList.remove(contact.getContactId());
+				contactList.remove(contact);
+				mAdapter = new EditAdapter(c, R.layout.contact_item);
+				listView2.setAdapter(mAdapter);
+				
+				
+				for(int i = 0; i < contactList.size(); i++){
+					mAdapter.add(contactList.get(i));
+				}
+				
+				
+			
+			}
+			
+			private int notificationRule(String s){
+				
+				if (s.equals("Once")){
+					return 1;
+				} else if (s.equals("Daily")){
+					return 3;
+				} else if (s.equals("Weekly")){
+					return 4;
+				} else if (s.equals("Monthly")){
+					return 5;
+				} else if (s.equals("Yearly")){
+					return 6;
+				}
+				return 0;		
+			}
+
 
 		}

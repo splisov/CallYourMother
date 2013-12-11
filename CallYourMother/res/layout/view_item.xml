@@ -32,18 +32,18 @@
 			    android:paddingLeft="8dp"
 			    android:textSize="20dp"
 			    android:textColor="#000000"
-			    android:text="Joe Shmoe"/>  
+			    android:text="Joe Shmoe"/> 
 			    
-	     
-	        
-	        <TextView
+	            <TextView
 			    android:id="@+id/delete_contact_view"
 			    android:layout_width="wrap_content"
 			    android:layout_height="wrap_content"
 			    android:layout_alignParentRight="true"
 			    android:textSize="25dp"
 			    android:textColor="#ff0000"
-			    android:text="x"/>
+			    android:text=""/>
+			    
+	     
 			    
          </RelativeLayout>
         

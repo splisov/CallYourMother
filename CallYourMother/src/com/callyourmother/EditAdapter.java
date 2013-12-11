@@ -19,7 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class ContactAdapter extends ArrayAdapter<Contact> {
+public class EditAdapter extends ArrayAdapter<Contact> {
 
 	private final List<Contact> mItems = new ArrayList<Contact>();
 	private final Context mContext;
@@ -27,7 +27,7 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
 	private DatabaseClient db;
 
 	
-    public ContactAdapter(Context context, int layoutResourceId) {
+    public EditAdapter(Context context, int layoutResourceId) {
         super(context, layoutResourceId);
         this.layoutResourceId = layoutResourceId;
         mContext = context;
@@ -84,7 +84,7 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
 		deleteContact.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						AddCircleActivity.deleteTempContact(mContext, getItem(position));
+						EditCircleActivity.deleteTempContact(mContext, getItem(position));
 						
 					}
 		});

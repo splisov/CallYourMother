@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -33,10 +34,11 @@ public class AddCircleActivity extends Activity {
 	private static final int CONTACT_PICKER_RESULT = 1001;
 	private static final String CONTACT_BASE_URI = "content://com.android.contacts/data/";
 	
-	ListView listView2;
-	ContactAdapter mAdapter; 
+	static ListView listView2;
+	static ContactAdapter mAdapter; 
 	DatabaseClient db;
-	ArrayList<Long> CircleContacts;
+	static ArrayList<Long> CircleContacts;
+	static List<Contact> contactList;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class AddCircleActivity extends Activity {
 		mAdapter = new ContactAdapter(this, R.layout.contact_item);
 	
 		CircleContacts = new ArrayList<Long>();
+		contactList = new ArrayList<Contact>();
 		
 		// Set up View
 		listView2 = (ListView)findViewById(R.id.listView2);		      
@@ -127,6 +130,7 @@ public class AddCircleActivity extends Activity {
 				Contact newContact = new Contact(Long.parseLong(contactId), this.getApplicationContext());
 				mAdapter.add(newContact);
 				CircleContacts.add(Long.parseLong(contactId));
+				contactList.add(newContact);
 			} catch (NumberFormatException e) {
 				Log.i("DEBUG", "AddCircleActivity NumberFormatException " + e);
 			} catch (ContactNotFoundException e) {
@@ -136,6 +140,26 @@ public class AddCircleActivity extends Activity {
 	        Log.i("DEBUG", "AddCircleActivity: activity result not ok. Contact id: " + CONTACT_PICKER_RESULT); 
 	    }  
 	}  
+	
+	public static void deleteTempContact(Context c, Contact contact){
+		/*Log.i("DEBUG", "In AddCircleActivity for deletion of contact " + contact.getContactId());
+		mAdapter.remove(contact);
+		CircleContacts.remove(contact.getContactId());
+		mAdapter.clear();*/
+		
+			Log.i("DEBUG", "In AddCircleActivity for deletion of contact " + contact.getContactId());
+			mAdapter.remove(contact);
+			CircleContacts.remove(contact.getContactId());
+			contactList.remove(contact);
+			mAdapter = new ContactAdapter(c, R.layout.contact_item);
+			listView2.setAdapter(mAdapter);
+			
+			
+			for(int i = 0; i < contactList.size(); i++){
+				mAdapter.add(contactList.get(i));
+			}
+	
+	}
 	
 	
 	private int notificationRule(String s){
