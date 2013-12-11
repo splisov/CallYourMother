@@ -32,22 +32,15 @@ public class UpdateContactTransactions extends Activity {
 	private HashMap<String, Long> contactNameDate;
 	private HashMap<String, String> contactNameNumber;
 	private int minCallLength = 15;
-	private final Handler mHandler= new Handler();
+	private String callDetails;
 	
-	private Runnable mHandlerTask = new Runnable() {
-		
-		@Override
-		public void run() {
-			new GetCallDetailsTask().execute();
-			
-		}
-	};
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.update_contact_transactions);
+		Bundle data = getIntent().getBundleExtra("data");
+		callDetails = data.getString("data");
 	}
 
 	@Override
@@ -220,6 +213,7 @@ public class UpdateContactTransactions extends Activity {
 //		managedCursor.close();
 //		call.setText(out);
 		 */		
+		call.setText(callDetails);
 	}
 
 
