@@ -101,7 +101,7 @@ public class AddCircleActivity extends Activity {
 						String reoccuranceString = mySpinner.getSelectedItem().toString();
 						int reoccurance = notificationRule(reoccuranceString);
 						
-						NotificationRule notifRule = new NotificationRule(title, 1, reoccurance, new Date(System.currentTimeMillis()));
+						NotificationRule notifRule = new NotificationRule(title, 1, reoccurance, new Date(System.currentTimeMillis()-9871897324L));
 						
 						if (title.length() > 0){
 							Circle newCircle = new Circle(title);

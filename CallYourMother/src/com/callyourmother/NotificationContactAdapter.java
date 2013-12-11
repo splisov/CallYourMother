@@ -38,6 +38,14 @@ public class NotificationContactAdapter extends ArrayAdapter<Contact> {
         //this.db = new DatabaseClient(context);
         
     }
+    
+    public boolean includes(long contact){
+    	for(Contact con:mContacts){
+    		if(con.getContactId() == contact)
+    			return true;
+    	}
+    	return false;
+    }
 
 	@Override
 	public int getCount() {

@@ -239,7 +239,7 @@ public class DatabaseClient {
 	/*
 	 * returns a list of notification rules for the specified contactId and any notification rules for circles that the contact belongs to
 	 */
-	public static List<NotificationRule> getContactNotificationRules(long contactId) {
+	public List<NotificationRule> getContactNotificationRules(long contactId) {
 		List<NotificationRule> notificationRules = new ArrayList<NotificationRule>();
 
 		SQLiteDatabase sqldb = db.getReadableDatabase();

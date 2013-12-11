@@ -27,6 +27,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.callyourmother.data.AndroidUtility;
@@ -73,6 +74,8 @@ public class MainActivity extends Activity {
 		View header = (View)getLayoutInflater().inflate(R.layout.header, null);  
 		listView1.addHeaderView(header);
 		View notifFooterView = (View)getLayoutInflater().inflate(R.layout.notification_footer_view, null);
+		TextView footerText = (TextView) notifFooterView.findViewById(R.id.notificationView);
+		footerText.setText("View your call notifications!");
 		listView1.addFooterView(notifFooterView);
 		View circleFooterView = (View)getLayoutInflater().inflate(R.layout.add_circle_footer_view, null);
 		listView1.addFooterView(circleFooterView);
@@ -121,6 +124,9 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				NotifyUser.setData("Matt", 10);
 				Intent notiIntent = new Intent(MainActivity.this, NotifyUser.class);
+//				Bundle data = new Bundle();
+//				data.putString("data", callDetails.toString());
+//				notiIntent.putExtra("data", data);
 				startService(notiIntent);
 			}
 		});
@@ -341,7 +347,6 @@ public class MainActivity extends Activity {
 				updateNotification(contactNameNumber.get(s),contacts);
 
 			}
-			managedCursor.close();
 			Log.v("GetCallDetailsTask",out.toString());
 			return out;
 		}

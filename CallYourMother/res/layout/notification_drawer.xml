@@ -1,13 +1,14 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#D5E4EB">
+    android:background="#D5E4EB"
+    android:orientation="vertical" >
 
     <ListView
         android:id="@+id/listView3"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="fill_parent" />
 
     <TextView
         android:id="@+id/test"
@@ -15,4 +16,4 @@
         android:layout_height="100dip"
         android:text="" />
 
-</RelativeLayout>
+</LinearLayout>
