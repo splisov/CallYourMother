@@ -121,9 +121,6 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				NotifyUser.setData("Matt", 10);
 				Intent notiIntent = new Intent(MainActivity.this, NotifyUser.class);
-				Bundle data = new Bundle();
-				data.putString("data", callDetails.toString());
-				notiIntent.putExtra("data", data);
 				startService(notiIntent);
 			}
 		});
@@ -133,8 +130,15 @@ public class MainActivity extends Activity {
 		getCallsTest.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent showCalls = new Intent(MainActivity.this, UpdateContactTransactions.class);
-				startActivity(showCalls);
+				if (callDetails !=null){
+					Intent showCalls = new Intent(MainActivity.this, UpdateContactTransactions.class);
+					Bundle data = new Bundle();
+					data.putString("data", callDetails.toString());
+					showCalls.putExtra("data", data);
+					startActivity(showCalls);
+				} else {
+					Toast.makeText(getApplicationContext(), "Not ready yet", Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
 	}
@@ -241,7 +245,9 @@ public class MainActivity extends Activity {
 	protected void onResume(){
 		super.onResume();
 		Log.i("DEBUG", "In on resume");
-		new GetCallDetailsTask(this.getApplicationContext()).execute();
+		if (callDetails == null){
+			new GetCallDetailsTask(this.getApplicationContext()).execute();
+		}
 
 	}
 
@@ -282,7 +288,7 @@ public class MainActivity extends Activity {
 			int date = managedCursor.getColumnIndex( CallLog.Calls.DATE);
 			int duration = managedCursor.getColumnIndex( CallLog.Calls.DURATION);
 			int name = managedCursor.getColumnIndex( CallLog.Calls.CACHED_NAME);
-
+			timesContactCalled =new HashMap<String,Integer>();
 			ArrayList<String> arr = new ArrayList<String>(); 
 			while ( managedCursor.moveToNext() ) {
 				String phNumber = managedCursor.getString( number );
@@ -293,13 +299,9 @@ public class MainActivity extends Activity {
 				String callDuration = managedCursor.getString( duration );
 				String callName = managedCursor.getString( name );
 
-
-
 				if (Integer.valueOf(callDuration)<minCallLength){
 					continue;
 				}
-
-
 				String dir = null;
 				int dircode = Integer.parseInt( callType );
 				switch( dircode ) {
@@ -325,8 +327,10 @@ public class MainActivity extends Activity {
 					}
 				} else {
 					timesContactCalled.put(phNumber,1);
-					contactNameNumber.put(phNumber, callName);
-					contactNameDate.put(phNumber, (Long) callDayTime.getTime());
+					if (!contactNameNumber.containsKey(phNumber)){
+						contactNameNumber.put(phNumber, callName);
+						contactNameDate.put(phNumber, (Long) callDayTime.getTime());
+					}
 				}
 			}
 
