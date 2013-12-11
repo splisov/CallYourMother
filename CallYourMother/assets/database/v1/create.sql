@@ -29,6 +29,7 @@ CREATE TABLE NotificationRules (
 CREATE TABLE NotificationOccurrences (
 	notificationOccurrenceId integer primary key autoincrement,
 	notificationRuleId integer,
+	contactId integer,
 	date integer,					/* unix timestamp */
 	action integer					/* action constant value */
 );

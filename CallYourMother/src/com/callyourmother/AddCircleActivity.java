@@ -103,8 +103,8 @@ public class AddCircleActivity extends Activity {
 						
 						NotificationRule notifRule = new NotificationRule(title, 1, reoccurance, new Date(System.currentTimeMillis()));
 						
-						NotificationOccurrence occurrence = new NotificationOccurrence(notifRule.getNotificationRuleId(), new Date(System.currentTimeMillis()), 1);
-						db.saveNotificationOccurrence(occurrence);
+						//NotificationOccurrence occurrence = new NotificationOccurrence(notifRule.getNotificationRuleId(), new Date(System.currentTimeMillis()), 1);
+						//db.saveNotificationOccurrence(occurrence);
 						
 						if (title.length() > 0){
 							Circle newCircle = new Circle(title);

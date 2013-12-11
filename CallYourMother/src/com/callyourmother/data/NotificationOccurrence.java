@@ -8,17 +8,20 @@ public class NotificationOccurrence {
 	
 	private long notificationOccurrenceId = -1;
 	private long notificationRuleId;
+	private long contactId = -1;
 	private Date date;
 	private int action;
 	
-	public NotificationOccurrence(long notificationRuleId, Date date, int action) {
+	public NotificationOccurrence(long notificationRuleId, long contactId, Date date, int action) {
 		this.notificationRuleId = notificationRuleId;
+		this.contactId = contactId;
 		this.date = date;
 		this.action = action;
 	}
-	public NotificationOccurrence(long notificationOccurrenceId, long notificationRuleId, Date date, int action) {
+	public NotificationOccurrence(long notificationOccurrenceId, long notificationRuleId, long contactId, Date date, int action) {
 		this.notificationOccurrenceId = notificationOccurrenceId;
 		this.notificationRuleId = notificationRuleId;
+		this.contactId = contactId;
 		this.date = date;
 		this.action = action;
 	}
@@ -43,4 +46,7 @@ public class NotificationOccurrence {
 		return action;
 	}
 	
+	public long getContactId() {
+		return contactId;
+	}
 }

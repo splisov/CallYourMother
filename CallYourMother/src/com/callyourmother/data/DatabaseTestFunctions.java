@@ -36,7 +36,7 @@ public class DatabaseTestFunctions {
 		circleNotificationRule = db.saveCircleNotificationRule(circle.getCircleId(), circleNotificationRule);
 		circleNotificationRule.setDescription("Circle NotificationRule 1a");
 		circleNotificationRule = db.saveCircleNotificationRule(circle.getCircleId(), circleNotificationRule);
-		NotificationOccurrence circleNotificationOccurrence = new NotificationOccurrence(circleNotificationRule.getNotificationRuleId(), new Date(), NotificationOccurrence.ACTION_COMPLETED);
+		NotificationOccurrence circleNotificationOccurrence = new NotificationOccurrence(circleNotificationRule.getNotificationRuleId(), 1, new Date(), NotificationOccurrence.ACTION_COMPLETED);
 		circleNotificationOccurrence = db.saveNotificationOccurrence(circleNotificationOccurrence);
 		db.getNotificationOccurrences(circleNotificationOccurrence.getNotificationOccurrenceId());
 		db.deleteNotificationRule(circleNotificationRule.getNotificationRuleId());
@@ -65,7 +65,7 @@ public class DatabaseTestFunctions {
 		contactNotificationRule = db.saveContactNotificationRule(contact.getContactId(), contactNotificationRule);
 		contactNotificationRule.setDescription("Contact NotificationRule 1a");
 		contactNotificationRule = db.saveCircleNotificationRule(contact.getContactId(), contactNotificationRule);
-		NotificationOccurrence contactNotificationOccurrence = new NotificationOccurrence(contactNotificationRule.getNotificationRuleId(), new Date(), NotificationOccurrence.ACTION_IGNORED);
+		NotificationOccurrence contactNotificationOccurrence = new NotificationOccurrence(contactNotificationRule.getNotificationRuleId(), 1, new Date(), NotificationOccurrence.ACTION_IGNORED);
 		contactNotificationOccurrence = db.saveNotificationOccurrence(contactNotificationOccurrence);
 		db.getNotificationOccurrences(contactNotificationOccurrence.getNotificationOccurrenceId());
 		db.deleteNotificationRule(contactNotificationRule.getNotificationRuleId());
@@ -169,7 +169,7 @@ public class DatabaseTestFunctions {
 			calendar.setTime(startDate);
 			calendar.add(Calendar.DATE, data.firstOccurrence);
 			firstOccurrence = calendar.getTime();
-			notificationOccurrence = new NotificationOccurrence(notificationRule.getNotificationRuleId(), firstOccurrence, NotificationOccurrence.ACTION_COMPLETED); //create occurrence
+			notificationOccurrence = new NotificationOccurrence(notificationRule.getNotificationRuleId(), 1, firstOccurrence, NotificationOccurrence.ACTION_COMPLETED); //create occurrence
 			db.saveNotificationOccurrence(notificationOccurrence); //save occurrence
 			nextNotification = notificationRule.getNextNotification(db.getNotificationOccurrences(notificationRule.getNotificationRuleId())); //get the next notification date
 			if(data.interval == NotificationRule.INTERVAL_WEEKS) {
@@ -184,7 +184,7 @@ public class DatabaseTestFunctions {
 			calendar.setTime(firstOccurrence);
 			calendar.add(Calendar.DATE, data.secondOccurrence);
 			secondOccurrence = calendar.getTime();
-			notificationOccurrence = new NotificationOccurrence(notificationRule.getNotificationRuleId(), secondOccurrence, NotificationOccurrence.ACTION_IGNORED); //create occurrence
+			notificationOccurrence = new NotificationOccurrence(notificationRule.getNotificationRuleId(), 1, secondOccurrence, NotificationOccurrence.ACTION_IGNORED); //create occurrence
 			db.saveNotificationOccurrence(notificationOccurrence); //save occurrence
 			nextNotification = notificationRule.getNextNotification(db.getNotificationOccurrences(notificationRule.getNotificationRuleId())); //get the next notification date
 			calendar.add(Calendar.DATE, 1);	//add 1 day for ignoring
@@ -195,7 +195,7 @@ public class DatabaseTestFunctions {
 			calendar.setTime(secondOccurrence);
 			calendar.add(Calendar.DATE, data.thirdOccurrence);
 			thirdOccurrence = calendar.getTime();
-			notificationOccurrence = new NotificationOccurrence(notificationRule.getNotificationRuleId(), thirdOccurrence, NotificationOccurrence.ACTION_COMPLETED); //create occurrence
+			notificationOccurrence = new NotificationOccurrence(notificationRule.getNotificationRuleId(), 1, thirdOccurrence, NotificationOccurrence.ACTION_COMPLETED); //create occurrence
 			db.saveNotificationOccurrence(notificationOccurrence); //save occurrence
 			nextNotification = notificationRule.getNextNotification(db.getNotificationOccurrences(notificationRule.getNotificationRuleId())); //get the next notification date
 			if(data.interval == NotificationRule.INTERVAL_WEEKS) {
@@ -219,7 +219,7 @@ public class DatabaseTestFunctions {
 		calendar.setTime(notificationDate);
 		calendar.add(Calendar.DATE, 15);
 		firstOccurrence = calendar.getTime();
-		notificationOccurrence = new NotificationOccurrence(notificationRule.getNotificationRuleId(), firstOccurrence, NotificationOccurrence.ACTION_IGNORED); //create occurrence
+		notificationOccurrence = new NotificationOccurrence(notificationRule.getNotificationRuleId(), 1, firstOccurrence, NotificationOccurrence.ACTION_IGNORED); //create occurrence
 		db.saveNotificationOccurrence(notificationOccurrence); //save occurrence
 		calendar.setTime(firstOccurrence);
 		calendar.add(Calendar.DATE, 1);
@@ -227,7 +227,7 @@ public class DatabaseTestFunctions {
 		nextNotification = notificationRule.getNextNotification(db.getNotificationOccurrences(notificationRule.getNotificationRuleId())); //get the next notification date
 		testResults.put("One time(2)", nextNotification.equals(expectedDate));
 		secondOccurrence = calendar.getTime();
-		notificationOccurrence = new NotificationOccurrence(notificationRule.getNotificationRuleId(), secondOccurrence, NotificationOccurrence.ACTION_COMPLETED); //create occurrence
+		notificationOccurrence = new NotificationOccurrence(notificationRule.getNotificationRuleId(), 1, secondOccurrence, NotificationOccurrence.ACTION_COMPLETED); //create occurrence
 		db.saveNotificationOccurrence(notificationOccurrence); //save occurrence
 		nextNotification = notificationRule.getNextNotification(db.getNotificationOccurrences(notificationRule.getNotificationRuleId())); //get the next notification date
 		testResults.put("One time(3)", nextNotification == null);

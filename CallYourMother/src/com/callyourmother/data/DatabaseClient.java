@@ -59,20 +59,7 @@ public class DatabaseClient {
 	
 	public void deleteCircle(Circle circle) {
 		if(circle.getCircleId() > 0) {
-			SQLiteDatabase sqldb = db.getWritableDatabase();
-			sqldb.beginTransaction();
-			try {
-				//delete
-				sqldb.execSQL("DELETE FROM CircleContacts WHERE circleId = ?", new Object[] { circle.getCircleId() });
-				sqldb.execSQL("DELETE FROM NotificationOccurrences WHERE notificationRuleId IN(SELECT notificationRuleId FROM CircleNotificationRules WHERE circleId = ?)", new Object[] { circle.getCircleId() });
-				sqldb.execSQL("DELETE FROM NotificationRules WHERE notificationRuleId IN(SELECT notificationRuleId FROM CircleNotificationRules WHERE circleId = ?)", new Object[] { circle.getCircleId() });
-				sqldb.execSQL("DELETE FROM CircleNotificationRules WHERE circleId = ?", new Object[] { circle.getCircleId() });
-				sqldb.execSQL("DELETE FROM Circles WHERE circleId = ?", new Object[] { circle.getCircleId() });
-				sqldb.setTransactionSuccessful();
-			} finally {
-				sqldb.endTransaction();
-				sqldb.close();
-			}
+			deleteCircle(circle.getCircleId());
 		}
 	}
 	
@@ -83,6 +70,7 @@ public class DatabaseClient {
 			try {
 				//delete
 				sqldb.execSQL("DELETE FROM CircleContacts WHERE circleId = ?", new Object[] { circleId });
+				sqldb.execSQL("DELETE FROM ContactNotificationRules WHERE notificationRuleId IN(SELECT notificationRuleId FROM CircleNotificationRules WHERE circleId = ?)", new Object[] { circleId });
 				sqldb.execSQL("DELETE FROM NotificationOccurrences WHERE notificationRuleId IN(SELECT notificationRuleId FROM CircleNotificationRules WHERE circleId = ?)", new Object[] { circleId });
 				sqldb.execSQL("DELETE FROM NotificationRules WHERE notificationRuleId IN(SELECT notificationRuleId FROM CircleNotificationRules WHERE circleId = ?)", new Object[] { circleId });
 				sqldb.execSQL("DELETE FROM CircleNotificationRules WHERE circleId = ?", new Object[] { circleId });
@@ -184,6 +172,7 @@ public class DatabaseClient {
 		sqldb.beginTransaction();
 		try {
 			//delete
+			sqldb.execSQL("DELETE FROM ContactNotificationRules WHERE contactId = ? AND notificationRuleId IN(SELECT notificationRuleId FROM CircleNotificationRules circleId = ?)", new Object[] { contactId, circleId });
 			sqldb.execSQL("DELETE FROM CircleContacts WHERE contactId = ? AND circleId = ?", new Object[] { contactId, circleId });
 			sqldb.setTransactionSuccessful();
 		} finally {
@@ -200,8 +189,8 @@ public class DatabaseClient {
 		sqldb.beginTransaction();
 		try {
 			//delete
-			sqldb.execSQL("DELETE FROM NotificationOccurrences WHERE notificationRuleId IN(SELECT notificationRuleId FROM ContactNotificationRules WHERE contactId = ?)", new Object[] { contactId });
-			sqldb.execSQL("DELETE FROM NotificationRules WHERE notificationRuleId IN(SELECT notificationRuleId FROM ContactNotificationRules WHERE contactId = ?)", new Object[] { contactId });
+			//sqldb.execSQL("DELETE FROM NotificationOccurrences WHERE notificationRuleId IN(SELECT notificationRuleId FROM ContactNotificationRules WHERE contactId = ?)", new Object[] { contactId });
+			//sqldb.execSQL("DELETE FROM NotificationRules WHERE notificationRuleId IN(SELECT notificationRuleId FROM ContactNotificationRules WHERE contactId = ?)", new Object[] { contactId });
 			sqldb.execSQL("DELETE FROM ContactNotificationRules WHERE contactId = ?", new Object[] { contactId });
 			sqldb.execSQL("DELETE FROM CircleContacts WHERE contactId = ?", new Object[] { contactId });
 			sqldb.setTransactionSuccessful();
@@ -234,14 +223,14 @@ public class DatabaseClient {
 	}
 	
 	/*
-	 * returns a list of notification rules for the specified contactId
+	 * returns a list of notification rules for the specified contactId and any notification rules for circles that the contact belongs to
 	 */
 	public static List<NotificationRule> getContactNotificationRules(long contactId) {
 		List<NotificationRule> notificationRules = new ArrayList<NotificationRule>();
 
 		SQLiteDatabase sqldb = db.getReadableDatabase();
 		try {
-			Cursor c = sqldb.rawQuery("SELECT notificationRuleId, description, interval, intervalIncrement, startDate FROM NotificationRules WHERE notificationRuleId IN(SELECT notificationRuleId FROM ContactNotificationRules WHERE contactId = ?)", new String[] { String.valueOf(contactId) });
+			Cursor c = sqldb.rawQuery("SELECT notificationRuleId, description, interval, intervalIncrement, startDate FROM NotificationRules WHERE notificationRuleId IN(SELECT notificationRuleId FROM ContactNotificationRules WHERE contactId = ?) OR notificationRuleId IN(SELECT notificationRuleId FROM CircleNotificationRules WHERE circleId IN(SELECT circleId FROM CircleContacts WHERE contactId = ?))", new String[] { String.valueOf(contactId), String.valueOf(contactId) });
 			c.moveToFirst();
 			while(!c.isAfterLast()) {
 				notificationRules.add( new NotificationRule(c.getLong(0), c.getString(1), c.getInt(2), c.getInt(3), (!c.isNull(4)?new Date(c.getLong(4)):null) ));
@@ -370,7 +359,7 @@ public class DatabaseClient {
 			sqldb.close();
 		}
 	}	
-	
+
 	/*
 	 * returns a stack of notification occurrences with the most recent at the top of the stack
 	 */
@@ -379,10 +368,32 @@ public class DatabaseClient {
 
 		SQLiteDatabase sqldb = db.getReadableDatabase();
 		try {
-			Cursor c = sqldb.rawQuery("SELECT notificationOccurrenceId, date, action FROM NotificationOccurrences WHERE notificationRuleId = ? ORDER BY date", new String[] { String.valueOf(notificationRuleId) });
+			Cursor c = sqldb.rawQuery("SELECT notificationOccurrenceId, contactId, date, action FROM NotificationOccurrences WHERE notificationRuleId = ? ORDER BY date", new String[] { String.valueOf(notificationRuleId) });
 			c.moveToFirst();
 			while(!c.isAfterLast()) {
-				notificationOccurrences.push(new NotificationOccurrence(c.getLong(0), notificationRuleId, new Date(c.getLong(1)), c.getInt(2) ) );
+				notificationOccurrences.push(new NotificationOccurrence(c.getLong(0), notificationRuleId, c.getLong(1), new Date(c.getLong(2)), c.getInt(3) ) );
+				c.moveToNext();
+			}
+			c.close();
+		} finally {
+			sqldb.close();
+		}
+		
+		return notificationOccurrences;
+	}
+	
+	/*
+	 * returns a stack of notification occurrences with the most recent at the top of the stack
+	 */
+	public Stack<NotificationOccurrence> getNotificationOccurrences(long notificationRuleId, long contactId) {
+		Stack<NotificationOccurrence> notificationOccurrences = new Stack<NotificationOccurrence>();
+
+		SQLiteDatabase sqldb = db.getReadableDatabase();
+		try {
+			Cursor c = sqldb.rawQuery("SELECT notificationOccurrenceId, contactId, date, action FROM NotificationOccurrences WHERE notificationRuleId = ? AND contactId = ? ORDER BY date", new String[] { String.valueOf(notificationRuleId), String.valueOf(contactId) });
+			c.moveToFirst();
+			while(!c.isAfterLast()) {
+				notificationOccurrences.push(new NotificationOccurrence(c.getLong(0), notificationRuleId, c.getLong(1), new Date(c.getLong(2)), c.getInt(3) ) );
 				c.moveToNext();
 			}
 			c.close();
@@ -402,10 +413,10 @@ public class DatabaseClient {
 		try {
 			if(notificationOccurrence.getNotificationOccurrenceId() > 0) {
 				//update
-				sqldb.execSQL("UPDATE NotificationOccurrences SET notificationRuleId = ?, date = ?, action = ? WHERE notificationOccurrenceId = ?", new Object[] { notificationOccurrence.getNotificationRuleId(), notificationOccurrence.getDate().getTime(), notificationOccurrence.getAction(), notificationOccurrence.getNotificationOccurrenceId() });
+				sqldb.execSQL("UPDATE NotificationOccurrences SET notificationRuleId = ?, contactId = ?, date = ?, action = ? WHERE notificationOccurrenceId = ?", new Object[] { notificationOccurrence.getNotificationRuleId(), notificationOccurrence.getContactId(), notificationOccurrence.getDate().getTime(), notificationOccurrence.getAction(), notificationOccurrence.getNotificationOccurrenceId() });
 			} else {
 				//insert
-				sqldb.execSQL("INSERT INTO NotificationOccurrences(notificationRuleId, date, action) VALUES(?,?,?)", new Object[] { notificationOccurrence.getNotificationRuleId(), notificationOccurrence.getDate().getTime(), notificationOccurrence.getAction() });
+				sqldb.execSQL("INSERT INTO NotificationOccurrences(notificationRuleId, contactId, date, action) VALUES(?,?,?,?)", new Object[] { notificationOccurrence.getNotificationRuleId(), notificationOccurrence.getContactId(), notificationOccurrence.getDate().getTime(), notificationOccurrence.getAction() });
 				Cursor c = sqldb.rawQuery("SELECT MAX(notificationOccurrenceId) FROM NotificationOccurrences", null);
 				if(c.moveToFirst()) {
 					notificationOccurrence.setNotificationOccurrenceId(c.getLong(0));
