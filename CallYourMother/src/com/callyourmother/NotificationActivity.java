@@ -61,13 +61,15 @@ public class NotificationActivity extends Activity {
 						Date date = new Date(
 								System.currentTimeMillis() - 1200000);
 
-						Log.v("Callyourmother",
-								"Ruletime: " + ruleTime.toString());
-
-						Log.v("Callyourmother", "Ruletime, beforedate : "
-								+ date.toString());
 
 						if (ruleTime != null && ruleTime.before(date)) {
+
+							Log.v("Callyourmother",
+									"Ruletime: " + ruleTime.toString());
+
+							Log.v("Callyourmother", "Ruletime, beforedate : "
+									+ date.toString());
+							
 							long diffdate = date.getTime() - ruleTime.getTime();
 							diffdate = diffdate / 86400000;
 							numDaysSince = (int) diffdate;

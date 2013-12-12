@@ -42,6 +42,10 @@ public class NotificationOccurrence {
 		return date;
 	}
 	
+	public void setAction(int action){
+		this.action = action;
+	}
+	
 	public int getAction() {
 		return action;
 	}
