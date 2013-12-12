@@ -499,7 +499,7 @@ public class MainActivity extends Activity {
 				Date ruleTime = getLastRuleUpdate(rules);
 				// if contact has a notification rule that would need to update
 				// the next notification
-				if (!rules.isEmpty()) {
+				if (!rules.isEmpty() && contactNameDate!=null) {
 					// String s = rules.toString();
 					// Calendar c = Calendar.getInstance();
 					// long now = c.getTime().getTime();
