@@ -146,38 +146,38 @@ public class MainActivity extends Activity {
 		});
 
 		// Tests Notification bar Notifications
-		Button notiTest = (Button) findViewById(R.id.notification_test);
-		notiTest.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				NotifyUser.setData("Matt", 10);
-				Intent notiIntent = new Intent(MainActivity.this,
-						NotifyUser.class);
-				// Bundle data = new Bundle();
-				// data.putString("data", callDetails.toString());
-				// notiIntent.putExtra("data", data);
-				startService(notiIntent);
-			}
-		});
+//		Button notiTest = (Button) findViewById(R.id.notification_test);
+//		notiTest.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				NotifyUser.setData("Matt", 10);
+//				Intent notiIntent = new Intent(MainActivity.this,
+//						NotifyUser.class);
+//				// Bundle data = new Bundle();
+//				// data.putString("data", callDetails.toString());
+//				// notiIntent.putExtra("data", data);
+//				startService(notiIntent);
+//			}
+//		});
 
 		// Listener for grabbing user calls
-		Button getCallsTest = (Button) findViewById(R.id.get_calls_test);
-		getCallsTest.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (callDetails != null) {
-					Intent showCalls = new Intent(MainActivity.this,
-							UpdateContactTransactions.class);
-					Bundle data = new Bundle();
-					data.putString("data", callDetails.toString());
-					showCalls.putExtra("data", data);
-					startActivity(showCalls);
-				} else {
-					Toast.makeText(getApplicationContext(), "Not ready yet",
-							Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
+//		Button getCallsTest = (Button) findViewById(R.id.get_calls_test);
+//		getCallsTest.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				if (callDetails != null) {
+//					Intent showCalls = new Intent(MainActivity.this,
+//							UpdateContactTransactions.class);
+//					Bundle data = new Bundle();
+//					data.putString("data", callDetails.toString());
+//					showCalls.putExtra("data", data);
+//					startActivity(showCalls);
+//				} else {
+//					Toast.makeText(getApplicationContext(), "Not ready yet",
+//							Toast.LENGTH_SHORT).show();
+//				}
+//			}
+//		});
 	}
 
 	@Override

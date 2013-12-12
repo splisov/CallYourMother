@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <Button
+     <!--    <Button
             android:id="@+id/notification_test"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,14 +25,14 @@
 	        android:text="Get recent calls"
 	        android:layout_weight="0.33"
 	        android:textSize="12dp" />
-         
+          -->
          
          <Button
             android:id="@+id/add_circle_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add a Circle"
-            android:layout_weight="0.33"
+            android:layout_weight="1"
             android:textSize="12dp" />
 
          
