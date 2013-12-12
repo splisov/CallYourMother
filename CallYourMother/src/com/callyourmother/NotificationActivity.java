@@ -41,13 +41,13 @@ public class NotificationActivity extends Activity {
 		builder.setMessage("You can't dismiss loved ones! Call " + name + " now?").setTitle(
 				"Go and call them!");
 
-		builder.setNegativeButton("No",
+		builder.setNegativeButton("Hold on!",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						// User clicked OK button
 					}
 				});
-		builder.setPositiveButton("Ok, fine",
+		builder.setPositiveButton("Ok, fine...",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						// User cancelled the dialog
