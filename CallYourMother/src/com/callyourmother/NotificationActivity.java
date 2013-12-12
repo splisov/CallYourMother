@@ -12,10 +12,16 @@ import com.callyourmother.data.NotificationOccurrence;
 import com.callyourmother.data.NotificationRule;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +32,36 @@ public class NotificationActivity extends Activity {
 
 	static int numDaysSince = 0;
 
-	public void resetNotification() {
+	public static void resetNotification(final Context context, CharSequence name, final CharSequence number) {
+		// 1. Instantiate an AlertDialog.Builder with its constructor
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
+		// 2. Chain together various setter methods to set the dialog
+		// characteristics
+		builder.setMessage("You can't dismiss loved ones! Call " + name + " now?").setTitle(
+				"Go and call them!");
+
+		builder.setNegativeButton("No",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						// User clicked OK button
+					}
+				});
+		builder.setPositiveButton("Ok, fine",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						// User cancelled the dialog
+						String uri = "tel:" + number.toString();
+					    Intent intent = new Intent(Intent.ACTION_CALL);
+
+					    intent.setData(Uri.parse(uri));
+					    context.startActivity(intent);
+					}
+				});
+
+		// 3. Get the AlertDialog from create()
+		AlertDialog dialog = builder.create();
+		dialog.show();
 	}
 
 	@Override
@@ -61,7 +95,6 @@ public class NotificationActivity extends Activity {
 						Date date = new Date(
 								System.currentTimeMillis() - 1200000);
 
-
 						if (ruleTime != null && ruleTime.before(date)) {
 
 							Log.v("Callyourmother",
@@ -69,7 +102,7 @@ public class NotificationActivity extends Activity {
 
 							Log.v("Callyourmother", "Ruletime, beforedate : "
 									+ date.toString());
-							
+
 							long diffdate = date.getTime() - ruleTime.getTime();
 							diffdate = diffdate / 86400000;
 							numDaysSince = (int) diffdate;
@@ -91,8 +124,9 @@ public class NotificationActivity extends Activity {
 
 		listView3 = (ListView) findViewById(R.id.listView3);
 		if (mAdapter.isEmpty()) {
-			View notifFooterView = (View)getLayoutInflater().inflate(R.layout.notification_footer_view, null);
-			
+			View notifFooterView = (View) getLayoutInflater().inflate(
+					R.layout.notification_footer_view, null);
+
 			listView3.addFooterView(notifFooterView);
 			listView3.setAdapter(mAdapter);
 
@@ -105,7 +139,9 @@ public class NotificationActivity extends Activity {
 
 			header_text.setText("");
 			listView3.addHeaderView(header);
+
 			listView3.setAdapter(mAdapter);
+
 		}
 	}
 }
